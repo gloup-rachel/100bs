@@ -1,0 +1,8 @@
+.DS_Store
+*.lock
+~$*
+node_modules/
+.env*
+*.xlsx
+*.docx
+*.skill

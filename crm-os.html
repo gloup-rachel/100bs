@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>백년밥상 CRM 자동화 OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #9a9890;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --accent-light: rgba(217,119,87,0.08);
+      --accent-border: rgba(217,119,87,0.22);
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --green-text: #516244;
+      --green-border: rgba(120,140,93,0.25);
+      --yellow: #a07a10;
+      --yellow-bg: #fdf6e0;
+      --red: #c04444;
+      --red-bg: #fceaea;
+      --red-border: rgba(192,68,68,0.22);
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+      --radius-lg: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Lora', Georgia, serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ─── Header ─── */
+    .header { background: var(--header-bg); color: var(--header-text); padding: 0.875rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .header h1 { font-family: 'Poppins', sans-serif; font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; }
+    .header-sub { font-size: 0.7125rem; opacity: 0.5; margin-top: 0.15rem; }
+    .header-right { font-family: 'Poppins', sans-serif; font-size: 0.7125rem; opacity: 0.6; text-align: right; line-height: 1.7; }
+
+    /* ─── Tab Nav ─── */
+    .tab-nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; padding: 0 2rem; flex-shrink: 0; }
+    .tab-btn { font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 500; color: var(--text-muted); background: none; border: none; border-bottom: 2px solid transparent; padding: 0.8rem 1rem; cursor: pointer; transition: color .15s, border-color .15s; white-space: nowrap; }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ─── Main ─── */
+    .main { flex: 1; padding: 1.5rem 2rem 3rem; max-width: 920px; width: 100%; margin: 0 auto; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ─── Cards ─── */
+    .section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 0.875rem; }
+    .section-header { font-family: 'Poppins', sans-serif; font-size: 0.675rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); background: var(--bg); border-radius: var(--radius-lg) var(--radius-lg) 0 0; display: flex; align-items: center; gap: 0.5rem; }
+    .section-header-actions { margin-left: auto; }
+    .section-body { padding: 1rem; }
+
+    /* ─── Criterion accordion ─── */
+    .criterion { border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .criterion-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 0.875rem; cursor: pointer; background: var(--bg); user-select: none; }
+    .criterion-header:hover { background: #f0efeb; }
+    .criterion-title { font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 500; flex: 1; }
+    .criterion-chevron { font-size: 0.6rem; color: var(--text-muted); }
+    .criterion-body { padding: 0.875rem; border-top: 1px solid var(--border); display: none; background: var(--surface); }
+    .criterion.open .criterion-body { display: block; }
+    .criteria-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+    /* ─── Skill badges ─── */
+    .skill-badge { font-family: 'Poppins', sans-serif; font-size: 0.575rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+    .skill-badge.auto   { background: rgba(120,140,93,0.12); color: var(--green-text); border: 1px solid var(--green-border); }
+    .skill-badge.manual { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* ─── Auto skill trigger area ─── */
+    .auto-body { background: rgba(120,140,93,0.04); }
+    .auto-trigger-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: var(--green-bg); border: 1px dashed var(--green-border); border-radius: var(--radius); margin-bottom: 0.625rem; }
+    .auto-trigger-desc { font-size: 0.8rem; color: var(--green-text); flex: 1; line-height: 1.4; }
+    .auto-trigger-desc strong { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; display: block; }
+    .skill-status { font-family: 'Poppins', sans-serif; font-size: 0.725rem; color: var(--green-text); padding: 0.3rem 0.625rem; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: var(--radius); display: none; }
+    .skill-status.visible { display: inline-block; }
+
+    /* ─── Form elements ─── */
+    label { font-family: 'Poppins', sans-serif; font-size: 0.7125rem; font-weight: 500; color: var(--text-muted); display: block; margin-bottom: 0.3rem; }
+    input[type="text"], input[type="date"], input[type="number"], input[type="url"], textarea, select { width: 100%; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'Lora', Georgia, serif; font-size: 0.875rem; color: var(--text); background: var(--bg); transition: border-color .15s; appearance: auto; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 3.5rem; line-height: 1.6; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { margin-bottom: 0.75rem; }
+    .form-group:last-child { margin-bottom: 0; }
+    .hint { font-size: 0.7125rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+    /* ─── Check items ─── */
+    .check-item { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+    .check-item:last-child { border-bottom: none; }
+    input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+    .check-label { font-family: 'Lora', serif; font-size: 0.875rem; color: var(--text); cursor: pointer; }
+
+    /* ─── Radio cards ─── */
+    .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .radio-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 0.625rem 0.875rem; cursor: pointer; transition: all .15s; }
+    .radio-card:hover { border-color: var(--accent); }
+    .radio-card.selected { border-color: var(--accent); background: var(--accent-light); }
+    .radio-card input { display: none; }
+    .radio-label { font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 500; }
+    .radio-desc { font-size: 0.7125rem; color: var(--text-muted); margin-top: 0.1rem; }
+
+    /* ─── Product rows ─── */
+    .product-row { display: grid; grid-template-columns: 1.75rem 1fr 1.2fr; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+    .product-row:last-child { margin-bottom: 0; }
+    .product-num { font-family: 'Poppins', sans-serif; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); text-align: center; }
+
+    /* ─── D-day bar ─── */
+    .dday-bar { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.125rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 0.875rem; }
+    .dday-date-picker { display: flex; flex-direction: column; }
+    .dday-date-picker label { margin-bottom: 0.25rem; }
+    .dday-date-picker input { width: 155px; }
+    .dday-badge { font-family: 'Poppins', sans-serif; font-size: 1.625rem; font-weight: 700; min-width: 3.5rem; text-align: center; color: var(--text-muted); }
+    .dday-badge.ok { color: var(--green); }
+    .dday-badge.warn { color: var(--yellow); }
+    .dday-badge.danger { color: var(--red); }
+    .dday-info { flex: 1; }
+    .dday-info h3 { font-family: 'Poppins', sans-serif; font-size: 0.875rem; font-weight: 500; }
+    .dday-info p { font-size: 0.7125rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .dday-warning { font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 500; color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); border-radius: var(--radius); padding: 0.4rem 0.75rem; flex-shrink: 0; }
+
+    /* ─── Buttons ─── */
+    .btn { font-family: 'Poppins', sans-serif; font-size: 0.8rem; font-weight: 500; padding: 0.6rem 1.25rem; border-radius: var(--radius); border: none; cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 0.375rem; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg); }
+    .btn-green { background: var(--green); color: white; }
+    .btn-green:hover { background: var(--green-text); }
+    .btn-ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent-border); }
+    .btn-ghost:hover { background: var(--accent-light); }
+    .btn-sm { font-size: 0.725rem; padding: 0.375rem 0.75rem; }
+    .btn-lg { font-size: 0.9rem; padding: 0.75rem 2rem; }
+    .action-bar { display: flex; gap: 0.625rem; justify-content: flex-end; padding: 0.5rem 0 1rem; flex-wrap: wrap; }
+
+    /* ─── Info box ─── */
+    .info-box { background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: var(--radius); padding: 0.75rem 1rem; font-size: 0.8125rem; margin-bottom: 0.875rem; }
+    .info-box strong { font-family: 'Poppins', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--accent); display: block; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ─── Pipeline ─── */
+    .pipeline-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.875rem; }
+    .pipeline-header h2 { font-family: 'Poppins', sans-serif; font-size: 0.9375rem; font-weight: 600; }
+    .pipeline-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 0.75rem; }
+    .pipeline-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.875rem; }
+    .pipeline-product { font-family: 'Poppins', sans-serif; font-size: 0.9375rem; font-weight: 600; }
+    .pipeline-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem; }
+    .pipeline-dday { font-family: 'Poppins', sans-serif; font-size: 1.125rem; font-weight: 700; }
+    .step-track { display: flex; gap: 3px; margin-bottom: 0.75rem; }
+    .step-item { flex: 1; text-align: center; font-family: 'Poppins', sans-serif; font-size: 0.6rem; font-weight: 500; padding: 0.4rem 0.1rem; border-radius: 4px; line-height: 1.3; }
+    .step-item.done    { background: var(--green-bg); color: var(--green-text); }
+    .step-item.current { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
+    .step-item.pending { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+    .step-item.overdue { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .pipeline-footer { display: flex; align-items: center; gap: 0.375rem; flex-wrap: wrap; }
+    .gate-tag { font-family: 'Poppins', sans-serif; font-size: 0.6rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .gate-tag.ok   { background: var(--green-bg); color: var(--green-text); }
+    .gate-tag.warn { background: var(--yellow-bg); color: var(--yellow); }
+    .gate-tag.fail { background: var(--red-bg); color: var(--red); }
+    .gate-ref-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+    .gate-ref-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.875rem; }
+    .gate-ref-title { font-family: 'Poppins', sans-serif; font-size: 0.7rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .gate-ref-body { font-size: 0.8rem; line-height: 1.55; }
+    .gate-ref-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.375rem; }
+
+    /* ─── Discount toggle ─── */
+    #discount-fields { display: none; margin-top: 0.75rem; }
+    #discount-fields.visible { display: block; }
+    #price-calc { font-family: 'Poppins', sans-serif; font-size: 0.75rem; color: var(--green-text); background: var(--green-bg); border-radius: var(--radius); padding: 0.3rem 0.625rem; display: none; margin-top: 0.375rem; }
+
+    /* ─── Empty state ─── */
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+    .empty-state .empty-icon { font-size: 2.25rem; margin-bottom: 0.625rem; }
+    .empty-state p { font-size: 0.875rem; line-height: 1.6; }
+
+    /* ─── Modals ─── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border-radius: var(--radius-lg); width: 100%; max-width: 580px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,0.18); }
+    .modal.modal-lg { max-width: 640px; }
+    .modal-header { font-family: 'Poppins', sans-serif; font-size: 0.875rem; font-weight: 600; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-body { flex: 1; overflow-y: auto; padding: 1.25rem; }
+    .modal-footer { padding: 0.875rem 1.25rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .modal-close { background: none; border: none; font-size: 1.125rem; cursor: pointer; color: var(--text-muted); line-height: 1; padding: 0.125rem; }
+    .modal-close:hover { color: var(--text); }
+    .message-preview { background: #f0efeb; border-radius: var(--radius); padding: 1rem; font-size: 0.9rem; line-height: 1.75; white-space: pre-wrap; border-left: 3px solid var(--accent); word-break: keep-all; }
+    .modal-note { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+
+    /* ─── Product catalog modal ─── */
+    .catalog-intro { font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.6; }
+    .catalog-intro strong { color: var(--text); font-family: 'Poppins', sans-serif; font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 0.25rem; }
+    #catalog-textarea { font-family: 'Poppins', monospace, sans-serif; font-size: 0.8125rem; min-height: 280px; line-height: 1.65; }
+
+    /* ─── Excel upload zone ─── */
+    .upload-zone { border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: all .2s; background: var(--bg); }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--accent); background: var(--accent-light); }
+    .upload-zone .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+    .upload-zone p { font-family: 'Poppins', sans-serif; font-size: 0.8125rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+    .upload-zone p strong { color: var(--accent); }
+    .upload-zone input[type="file"] { display: none; }
+    .catalog-counts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.625rem; margin: 0.875rem 0; }
+    .catalog-count-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.625rem 0.75rem; text-align: center; }
+    .catalog-count-card .count-num { font-family: 'Poppins', sans-serif; font-size: 1.375rem; font-weight: 700; color: var(--accent); }
+    .catalog-count-card .count-label { font-family: 'Poppins', sans-serif; font-size: 0.65rem; color: var(--text-muted); margin-top: 0.1rem; line-height: 1.4; }
+    .catalog-success { background: var(--green-bg); border: 1px solid var(--green-border); border-radius: var(--radius); padding: 0.625rem 0.875rem; font-family: 'Poppins', sans-serif; font-size: 0.8125rem; color: var(--green-text); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .catalog-parse-error { background: var(--red-bg); border: 1px solid var(--red-border); border-radius: var(--radius); padding: 0.625rem 0.875rem; font-family: 'Poppins', sans-serif; font-size: 0.8125rem; color: var(--red); margin-bottom: 0.75rem; }
+    .catalog-edit-toggle { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+    .catalog-edit-toggle label { font-family: 'Poppins', sans-serif; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; margin: 0; }
+    #catalog-edit-area { display: none; margin-top: 0.625rem; }
+    #catalog-edit-area textarea { font-family: 'Poppins', monospace, sans-serif; font-size: 0.75rem; min-height: 220px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="header">
+  <div>
+    <h1>백년밥상 CRM 자동화 OS</h1>
+    <div class="header-sub">상품 선정 → 게이트 관리 → CRM 작성 파이프라인</div>
+  </div>
+  <div class="header-right">
+    <div id="today-date">—</div>
+    <div>GLO:UP × 백년밥상</div>
+  </div>
+</header>
+
+<!-- ══ TAB NAV ══ -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab(1)">① 주간 상품 선정</button>
+  <button class="tab-btn" onclick="switchTab(2)">② CRM 게이트 현황</button>
+  <button class="tab-btn" onclick="switchTab(3)">③ CRM 메세지 작성</button>
+</nav>
+
+<div class="main">
+
+  <!-- ════ TAB 1: 상품 선정 ════ -->
+  <div id="tab-1" class="tab-content active">
+
+    <!-- D-day bar -->
+    <div class="dday-bar">
+      <div class="dday-date-picker">
+        <label>발송 예정일</label>
+        <input type="date" id="sendDate" onchange="updateDday()">
+      </div>
+      <div class="dday-badge" id="dday-badge">D-?</div>
+      <div class="dday-info">
+        <h3 id="dday-title">날짜를 선택하세요</h3>
+        <p id="dday-desc"></p>
+      </div>
+      <div id="gate-warning" style="display:none;" class="dday-warning">🚨 G2: D-3 이후 — 자동 보류 대상</div>
+    </div>
+
+    <!-- 기본 필터 -->
+    <div class="section">
+      <div class="section-header">기본 필터 — 후보 제외 조건 확인</div>
+      <div class="section-body">
+        <div class="check-item"><input type="checkbox" id="f1"><label class="check-label" for="f1">최근 2주 내 발송한 상품 없음 확인 완료</label></div>
+        <div class="check-item"><input type="checkbox" id="f2"><label class="check-label" for="f2">재고 부족 / 공급 불가 상품 없음 확인 완료</label></div>
+        <div class="check-item"><input type="checkbox" id="f3"><label class="check-label" for="f3">정헌 사장 보류 지시 상품 제외 확인 완료</label></div>
+      </div>
+    </div>
+
+    <!-- 5가지 기준 -->
+    <div class="section">
+      <div class="section-header">
+        5가지 선정 기준
+        <span class="section-header-actions">
+          <button class="btn btn-sm btn-secondary" style="font-size:0.675rem;" onclick="openCatalogModal()">📦 제품 목록 편집</button>
+        </span>
+      </div>
+      <div class="section-body" style="padding:0.75rem;">
+        <div class="criteria-list">
+
+          <!-- ★ 기준 1: 날씨 소구 — 자동 스킬 -->
+          <div class="criterion" id="c1">
+            <div class="criterion-header" onclick="toggleCriterion('c1')">
+              <span id="c1-status">⬜</span>
+              <span class="criterion-title">기준 1. 날씨 소구 🌤️</span>
+              <span class="skill-badge auto">🤖 자동 스킬</span>
+              <span class="criterion-chevron" id="c1-chev">▼</span>
+            </div>
+            <div class="criterion-body auto-body">
+              <div class="form-group">
+                <label>이번 주 날씨 선택</label>
+                <select id="c1-weather" onchange="markDone('c1')">
+                  <option value="">선택하세요</option>
+                  <option>더움 (25도 이상)</option>
+                  <option>폭염 (30도 이상)</option>
+                  <option>추움 / 비</option>
+                  <option>환절기 (일교차 큼)</option>
+                  <option>맑고 좋은 날</option>
+                </select>
+              </div>
+              <div class="auto-trigger-row">
+                <div class="auto-trigger-desc">
+                  <strong>날씨 기반 상품 자동 추천</strong>
+                  선택한 날씨 + 제품 목록을 기반으로 Claude가 최적 상품을 추천합니다.
+                </div>
+                <button class="btn btn-green btn-sm" onclick="triggerWeatherSkill()">날씨 기반 추천 받기 →</button>
+              </div>
+              <span class="skill-status" id="c1-skill-status">✓ Claude에게 추천 요청됨 — 채팅 결과를 아래 후보 필드에 입력하세요</span>
+            </div>
+          </div>
+
+          <!-- 기준 2: 재구매 유도 — 수동 입력 -->
+          <div class="criterion" id="c2">
+            <div class="criterion-header" onclick="toggleCriterion('c2')">
+              <span id="c2-status">⬜</span>
+              <span class="criterion-title">기준 2. 재구매 유도 🔁</span>
+              <span class="skill-badge manual">✏️ 수동 입력</span>
+              <span class="criterion-chevron" id="c2-chev">▼</span>
+            </div>
+            <div class="criterion-body">
+              <label>최근 가장 많이 재구매된 상품</label>
+              <input type="text" id="c2-product" placeholder="CRM 시트에서 확인 — 4주 이상 미구매 + 과거 구매 이력 상품" oninput="markDone('c2')">
+              <p class="hint" style="margin-top:0.4rem;">베스트셀러 중 구매 주기 짧은 상품도 해당됩니다</p>
+            </div>
+          </div>
+
+          <!-- 기준 3: 신제품 — 수동 입력 -->
+          <div class="criterion" id="c3">
+            <div class="criterion-header" onclick="toggleCriterion('c3')">
+              <span id="c3-status">⬜</span>
+              <span class="criterion-title">기준 3. 신제품 소개 🆕</span>
+              <span class="skill-badge manual">✏️ 수동 입력</span>
+              <span class="criterion-chevron" id="c3-chev">▼</span>
+            </div>
+            <div class="criterion-body">
+              <label>최근 신규 등록된 상품 (없으면 "없음" 입력)</label>
+              <input type="text" id="c3-product" placeholder="최근 4주 이내 신규 입고 상품명" oninput="markDone('c3')">
+            </div>
+          </div>
+
+          <!-- ★ 기준 4: 시즌성 트렌드 — 자동 스킬 -->
+          <div class="criterion" id="c4">
+            <div class="criterion-header" onclick="toggleCriterion('c4')">
+              <span id="c4-status">⬜</span>
+              <span class="criterion-title">기준 4. 시즌성 트렌드 📈</span>
+              <span class="skill-badge auto">🤖 자동 스킬</span>
+              <span class="criterion-chevron" id="c4-chev">▼</span>
+            </div>
+            <div class="criterion-body auto-body">
+              <div class="auto-trigger-row">
+                <div class="auto-trigger-desc">
+                  <strong>트렌드 서치 & 상품 자동 추천</strong>
+                  마켓컬리·쿠팡·인스타그램·네이버 쇼핑을 검색해 트렌드 키워드를 추출하고 백년밥상 제품을 매칭합니다.
+                </div>
+                <button class="btn btn-green btn-sm" onclick="triggerTrendSkill()">트렌드 서치 시작 →</button>
+              </div>
+              <span class="skill-status" id="c4-skill-status">✓ Claude에게 트렌드 서치 요청됨 — 채팅 결과를 아래 후보 필드에 입력하세요</span>
+              <div class="form-group" style="margin-top:0.625rem;margin-bottom:0">
+                <label>Claude 추천 결과 메모 (선택)</label>
+                <input type="text" id="c4-result" placeholder="추천 받은 트렌드 키워드 또는 상품 메모" oninput="markDone('c4')">
+              </div>
+            </div>
+          </div>
+
+          <!-- 기준 5: 프로모션 — 수동 입력 -->
+          <div class="criterion" id="c5">
+            <div class="criterion-header" onclick="toggleCriterion('c5')">
+              <span id="c5-status">⬜</span>
+              <span class="criterion-title">기준 5. 프로모션 🎁</span>
+              <span class="skill-badge manual">✏️ 수동 입력</span>
+              <span class="criterion-chevron" id="c5-chev">▼</span>
+            </div>
+            <div class="criterion-body">
+              <div class="check-item" style="padding:0 0 0.625rem;border:none;">
+                <input type="checkbox" id="c5-has-promo" onchange="togglePromo()">
+                <label class="check-label" for="c5-has-promo">이번 주 프로모션 있음</label>
+              </div>
+              <div id="c5-promo-detail" style="display:none;">
+                <input type="text" id="c5-promo" placeholder="예: VIP 15% 쿠폰, 무료배송, 묶음 할인" oninput="markDone('c5')">
+              </div>
+              <p class="hint">프로모션이 없으면 기준 1~4 중 가장 강한 소구 포인트로 집중</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- 최종 후보 상품 -->
+    <div class="section">
+      <div class="section-header">최종 후보 상품 선정 — 위 기준 결과를 종합해 입력</div>
+      <div class="section-body">
+        <div class="product-row">
+          <div class="product-num">①</div>
+          <input type="text" id="p1-name" placeholder="상품명">
+          <input type="text" id="p1-reason" placeholder="선정 근거 (예: 날씨 소구 + 시즌 피크)">
+        </div>
+        <div class="product-row">
+          <div class="product-num">②</div>
+          <input type="text" id="p2-name" placeholder="상품명">
+          <input type="text" id="p2-reason" placeholder="선정 근거">
+        </div>
+        <div class="product-row">
+          <div class="product-num" style="color:var(--border)">③</div>
+          <input type="text" id="p3-name" placeholder="상품명 (선택)">
+          <input type="text" id="p3-reason" placeholder="선정 근거 (선택)">
+        </div>
+        <div style="margin-top:1rem;padding-top:0.875rem;border-top:1px solid var(--border);">
+          <div class="auto-trigger-row" style="margin-bottom:0;">
+            <div class="auto-trigger-desc">
+              <strong>🤖 최종 상품 우선순위 추천</strong>
+              발송 요일·날씨·고객 구매 심리·선정 기준을 모두 종합해 1순위 → 2순위 → 3순위로 추천합니다.
+            </div>
+            <button class="btn btn-green" onclick="triggerRankingSkill()">우선순위 추천 받기 →</button>
+          </div>
+          <span class="skill-status" id="ranking-skill-status">✓ Claude에게 우선순위 분석 요청됨 — 채팅 결과를 확인하세요</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRM 유형 -->
+    <div class="section">
+      <div class="section-header">제안 CRM 유형</div>
+      <div class="section-body">
+        <div class="radio-grid">
+          <div class="radio-card" onclick="selectCRMType('A_단일프로모션', this)">
+            <input type="radio" name="crmType" value="A_단일프로모션">
+            <div class="radio-label">A. 단일 상품 프로모션</div>
+            <div class="radio-desc">1개 제품 집중 소개/할인</div>
+          </div>
+          <div class="radio-card" onclick="selectCRMType('B_등급별혜택', this)">
+            <input type="radio" name="crmType" value="B_등급별혜택">
+            <div class="radio-label">B. 등급별 혜택</div>
+            <div class="radio-desc">멤버십 등급 차별화 메세지</div>
+          </div>
+          <div class="radio-card" onclick="selectCRMType('C_복수제품추천', this)">
+            <input type="radio" name="crmType" value="C_복수제품추천">
+            <div class="radio-label">C. 복수 제품 큐레이션</div>
+            <div class="radio-desc">2~3개 묶음 추천</div>
+          </div>
+          <div class="radio-card" onclick="selectCRMType('D_시즌후킹', this)">
+            <input type="radio" name="crmType" value="D_시즌후킹">
+            <div class="radio-label">D. 시즌 후킹</div>
+            <div class="radio-desc">날씨/계절/트렌드 소구</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="goToCRMTab()">CRM 작성으로 넘어가기 →</button>
+    </div>
+
+  </div><!-- /tab-1 -->
+
+
+  <!-- ════ TAB 2: 게이트 현황 ════ -->
+  <div id="tab-2" class="tab-content">
+    <div class="pipeline-header">
+      <h2>진행 중인 CRM 파이프라인</h2>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ CRM 추가</button>
+    </div>
+    <div id="pipeline-list"></div>
+    <div class="section" style="margin-top:1.5rem;">
+      <div class="section-header">게이트 원칙 빠른 참조</div>
+      <div class="section-body">
+        <div class="gate-ref-grid">
+          <div class="gate-ref-card">
+            <div class="gate-ref-title" style="color:var(--accent)">G1 — 상품 선정</div>
+            <div class="gate-ref-body">죠가 먼저 5가지 기준으로 후보 제안 → 정헌 사장 승인</div>
+            <div class="gate-ref-sub">D-7 제안 / D-6 컨펌 / D-5 미회신→레이첼</div>
+          </div>
+          <div class="gate-ref-card">
+            <div class="gate-ref-title" style="color:var(--yellow)">G2 — D-3 자동 보류</div>
+            <div class="gate-ref-body">D-3 기준 기획 미시작 시 자동 보류. 강행 시 레이첼 승인 필수.</div>
+            <div class="gate-ref-sub">퀄리티 타협 강행 절대 금지</div>
+          </div>
+          <div class="gate-ref-card">
+            <div class="gate-ref-title" style="color:var(--green)">G3 — 단계 완료 확인</div>
+            <div class="gate-ref-body">이전 단계 미완료 시 다음 단계 진행 금지.</div>
+            <div class="gate-ref-sub">24시간 미응답 → 레이첼 공유 / 구두 확인 금지</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-2 -->
+
+
+  <!-- ════ TAB 3: CRM 메세지 작성 ════ -->
+  <div id="tab-3" class="tab-content">
+    <div class="info-box">
+      <strong>Step 0 — CRM 기본 정보 입력</strong>
+      아래 정보를 확인·수정한 뒤 <strong>CRM 메세지 생성 시작</strong>을 누르면 CRM 스킬이 자동 실행됩니다.
+      ① 상품 선정 탭에서 넘어온 경우 일부 항목이 자동 입력됩니다.
+    </div>
+
+    <div class="section">
+      <div class="section-header">제품 정보</div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label>제품명 *</label>
+            <input type="text" id="crm-product" placeholder="예: 냉모밀 세트">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>제품 카테고리 *</label>
+            <select id="crm-category">
+              <option value="">선택하세요</option>
+              <option>산지직배송</option>
+              <option>직접제조</option>
+              <option>직접매입</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">발송 정보</div>
+      <div class="section-body">
+        <div class="form-row three">
+          <div class="form-group" style="margin:0">
+            <label>발송 예정일 *</label>
+            <input type="date" id="crm-senddate">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>발송 시간 (자동 계산)</label>
+            <input type="text" id="crm-sendtime" placeholder="08:30 평일 / 11:00 주말">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>채널</label>
+            <select id="crm-channel"><option>카톡</option><option>문자</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">할인 / 프로모션 정보</div>
+      <div class="section-body">
+        <div class="check-item" style="padding:0;border:none;margin-bottom:0.5rem;">
+          <input type="checkbox" id="has-discount" onchange="toggleDiscount()">
+          <label class="check-label" for="has-discount">이번 CRM에 할인 또는 프로모션 있음</label>
+        </div>
+        <div id="discount-fields">
+          <div class="form-row three">
+            <div><label>정가 (원)</label><input type="number" id="crm-orig" placeholder="25000" oninput="calcDiscount()"></div>
+            <div><label>판매가 (원)</label><input type="number" id="crm-sale" placeholder="18000" oninput="calcDiscount()"></div>
+            <div><label>쿠폰 / 혜택</label><input type="text" id="crm-coupon" placeholder="예: VIP 추가 10% 쿠폰"></div>
+          </div>
+          <div id="price-calc"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">CRM 유형 및 타겟</div>
+      <div class="section-body">
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label>CRM 유형 *</label>
+            <select id="crm-type">
+              <option value="">선택하세요</option>
+              <option value="A_단일프로모션">A. 단일 상품 프로모션</option>
+              <option value="B_등급별혜택">B. 등급별 혜택</option>
+              <option value="C_복수제품추천">C. 복수 제품 큐레이션</option>
+              <option value="D_시즌후킹">D. 시즌 후킹</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>타겟 세그먼트 *</label>
+            <select id="crm-segment"><option>전체</option><option>등급별</option><option>세그먼트별</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">랜딩 URL 및 추가 배경</div>
+      <div class="section-body">
+        <div class="form-group">
+          <label>랜딩 URL *</label>
+          <input type="url" id="crm-url" placeholder="https://baengnyeonbabsang.com/product/...">
+          <p class="hint">UTM은 자동 생성됩니다 (utm_source=kakao&utm_medium=crm&utm_campaign=RT)</p>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label>추가 배경 / 소구 방향</label>
+          <textarea id="crm-context" placeholder="예: 이번 주 31도 예보, 냉모밀 시즌 피크, 산지직배송 강조 포인트"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar" style="padding-bottom:2rem;">
+      <button class="btn btn-secondary" onclick="switchTab(1)">← 상품 선정으로</button>
+      <button class="btn btn-primary btn-lg" onclick="startCRMGeneration()">✦ CRM 메세지 생성 시작</button>
+    </div>
+  </div><!-- /tab-3 -->
+
+</div><!-- /main -->
+
+
+<!-- ══ MODAL: 파이프라인 추가 ══ -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">CRM 파이프라인 추가 <button class="modal-close" onclick="closeModal('add-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>상품명 *</label><input type="text" id="add-product" placeholder="예: 냉모밀 세트"></div>
+      <div class="form-group"><label>발송 예정일 *</label><input type="date" id="add-date"></div>
+      <div class="form-group" style="margin:0"><label>현재 단계</label>
+        <select id="add-step">
+          <option value="0">G1 대기 (상품 선정 중)</option>
+          <option value="1">카피 작성 중</option>
+          <option value="2">이미지 제작 요청</option>
+          <option value="3">디자인 완료 대기</option>
+          <option value="4">소미 팀장 크로스체크</option>
+          <option value="5">헤일리 최종 세팅</option>
+          <option value="6">✅ 발송 완료</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('add-modal')">취소</button>
+      <button class="btn btn-primary btn-sm" onclick="savePipeline()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: 제품 목록 관리 ══ -->
+<div class="modal-overlay" id="catalog-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">백년밥상 제품 목록 관리 <button class="modal-close" onclick="closeModal('catalog-modal')">✕</button></div>
+    <div class="modal-body">
+
+      <!-- 상태: 초기 / 업로드 완료 -->
+      <div id="catalog-upload-view">
+        <div class="catalog-intro">
+          <strong>엑셀 파일로 제품 목록 불러오기</strong>
+          기초상품정보 엑셀 파일을 업로드하면 <code>상품사용여부=Y</code> 상품을 자동으로 카테고리별로 분류합니다.<br>
+          공급사명 기준: <strong>향천 포함 → 직접제조 밀키트</strong> / <strong>10시 통영해담·15시 서온축산 → 냉장/육가공</strong> / 나머지 → 산지직배송
+        </div>
+
+        <div class="upload-zone" id="catalog-drop-zone"
+             onclick="document.getElementById('catalog-file-input').click()"
+             ondragover="catalogDragOver(event)"
+             ondragleave="catalogDragLeave(event)"
+             ondrop="catalogDrop(event)">
+          <input type="file" id="catalog-file-input" accept=".xlsx,.xls" onchange="handleCatalogFileInput(event)">
+          <div class="upload-icon">📊</div>
+          <p><strong>클릭하거나 파일을 드래그</strong>해서 엑셀 업로드</p>
+          <p style="margin-top:0.25rem;font-size:0.7rem;">.xlsx 파일 (백년밥상기초상품정보_*.xlsx)</p>
+        </div>
+
+        <div id="catalog-parse-error" class="catalog-parse-error" style="display:none;margin-top:0.75rem;"></div>
+      </div>
+
+      <!-- 상태: 파싱 완료 -->
+      <div id="catalog-result-view" style="display:none;">
+        <div class="catalog-success" id="catalog-success-msg">
+          ✅ <span id="catalog-success-text"></span>
+        </div>
+        <div class="catalog-counts" id="catalog-count-grid"></div>
+        <div class="catalog-edit-toggle">
+          <input type="checkbox" id="catalog-show-edit" onchange="toggleCatalogEdit()">
+          <label for="catalog-show-edit">제품 목록 직접 편집하기 (고급)</label>
+          <button class="btn btn-sm btn-secondary" style="margin-left:auto;font-size:0.675rem;" onclick="resetCatalogUpload()">🔄 다시 업로드</button>
+        </div>
+        <div id="catalog-edit-area">
+          <textarea id="catalog-textarea" placeholder=""></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('catalog-modal')">취소</button>
+      <button class="btn btn-primary btn-sm" id="catalog-save-btn" onclick="saveCatalog()" disabled>저장</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ══════════════════════════════════════
+//  CONSTANTS & STATE
+// ══════════════════════════════════════
+const DEFAULT_PRODUCTS = `[산지직배송 제철 상품]
+(상품을 직접 입력하세요)
+
+[직접제조 밀키트]
+(상품을 직접 입력하세요)
+
+[직접매입 밀키트]
+(상품을 직접 입력하세요)`;
+
+const STEP_LABELS = ['G1 대기','카피 작성','이미지 요청','디자인','소미 체크','헤일리 세팅','✅ 완료'];
+
+let selectedCRMType = '';
+let pipeline = JSON.parse(localStorage.getItem('crm_pipeline_v2') || '[]');
+
+function loadProductList() {
+  return localStorage.getItem('crm_product_list') || DEFAULT_PRODUCTS;
+}
+
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('today-date').textContent =
+    now.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+
+  const sun = nextSunday();
+  document.getElementById('sendDate').value = sun;
+  document.getElementById('crm-senddate').value = sun;
+  document.getElementById('add-date').value = sun;
+  updateDday();
+  updateSendTime(sun);
+  renderPipeline();
+});
+
+function nextSunday() {
+  const d = new Date();
+  d.setDate(d.getDate() + (d.getDay() === 0 ? 7 : 7 - d.getDay()));
+  return d.toISOString().split('T')[0];
+}
+
+
+// ══════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════
+function switchTab(n) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + n).classList.add('active');
+  document.querySelectorAll('.tab-btn')[n - 1].classList.add('active');
+}
+
+
+// ══════════════════════════════════════
+//  D-DAY
+// ══════════════════════════════════════
+function updateDday() {
+  const val = document.getElementById('sendDate').value;
+  if (!val) return;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const send  = new Date(val + 'T00:00:00'); send.setHours(0,0,0,0);
+  const diff  = Math.round((send - today) / 86400000);
+  const badge = document.getElementById('dday-badge');
+  const title = document.getElementById('dday-title');
+  const desc  = document.getElementById('dday-desc');
+  const warn  = document.getElementById('gate-warning');
+  const label = send.toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' });
+
+  badge.textContent = diff >= 0 ? 'D-' + diff : 'D+' + Math.abs(diff);
+
+  if (diff >= 7)      { badge.className = 'dday-badge ok';     title.textContent = '✅ 여유 있음 — G1 체크를 진행하세요'; desc.textContent = '발송일: ' + label; warn.style.display = 'none'; }
+  else if (diff >= 4) { badge.className = 'dday-badge warn';   title.textContent = '⚠️ D-' + diff + ' — 빠르게 상품 확정 필요'; desc.textContent = '카피 작성 전 상품·방향 확정 | 발송일: ' + label; warn.style.display = 'none'; }
+  else if (diff === 3){ badge.className = 'dday-badge danger';  title.textContent = '🚨 D-3 경계선 — G2 적용 기준일'; desc.textContent = '오늘까지 기획 미시작 시 자동 보류'; warn.style.display = 'block'; }
+  else if (diff >= 0) { badge.className = 'dday-badge danger';  title.textContent = '🚨 G2 위반 — 보류 또는 레이첼 명시적 승인 필수'; desc.textContent = 'D-3 이후 자동 보류 원칙'; warn.style.display = 'block'; }
+  else                { badge.className = 'dday-badge danger';  title.textContent = '❌ 발송일이 지났습니다'; desc.textContent = ''; warn.style.display = 'none'; }
+
+  document.getElementById('crm-senddate').value = val;
+  updateSendTime(val);
+}
+
+function updateSendTime(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  document.getElementById('crm-sendtime').value = (d.getDay() === 0 || d.getDay() === 6) ? '11:00' : '08:30';
+}
+
+
+// ══════════════════════════════════════
+//  CRITERION ACCORDION
+// ══════════════════════════════════════
+function toggleCriterion(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+  document.getElementById(id + '-chev').textContent = el.classList.contains('open') ? '▲' : '▼';
+}
+
+function markDone(id) {
+  const body = document.getElementById(id).querySelector('.criterion-body');
+  const filled = [...body.querySelectorAll('input, select')]
+    .some(el => el.type !== 'checkbox' && el.value && el.value !== '');
+  const checked = [...body.querySelectorAll('input[type="checkbox"]')]
+    .some(el => el.checked);
+  document.getElementById(id + '-status').textContent = (filled || checked) ? '✅' : '⬜';
+}
+
+function togglePromo() {
+  const checked = document.getElementById('c5-has-promo').checked;
+  document.getElementById('c5-promo-detail').style.display = checked ? 'block' : 'none';
+  markDone('c5');
+}
+
+
+// ══════════════════════════════════════
+//  CRM TYPE
+// ══════════════════════════════════════
+function selectCRMType(type, card) {
+  selectedCRMType = type;
+  document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  document.getElementById('crm-type').value = type;
+}
+
+
+// ══════════════════════════════════════
+//  🤖 자동 스킬 1: 날씨 소구
+// ══════════════════════════════════════
+function triggerWeatherSkill() {
+  const weather = document.getElementById('c1-weather').value;
+  if (!weather) {
+    alert('이번 주 날씨를 먼저 선택해 주세요.');
+    document.getElementById('c1').classList.add('open');
+    document.getElementById('c1-chev').textContent = '▲';
+    return;
+  }
+
+  const sendDate  = document.getElementById('sendDate').value;
+  const dateLabel = sendDate
+    ? new Date(sendDate + 'T00:00:00').toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' })
+    : '미정';
+  const products  = loadProductList();
+
+  const prompt =
+`[백년밥상 CRM — 날씨 소구 상품 추천]
+
+발송 예정일: ${dateLabel}
+이번 주 날씨: ${weather}
+
+아래 백년밥상 제품 목록에서 "${weather}" 날씨 소구에 가장 잘 어울리는 CRM 상품 2~3개를 추천해줘.
+
+각 추천 상품에 대해:
+- 상품명
+- 날씨 소구 방향 한 줄 (구체적으로: 예) "31도 폭염에 집에서 시원하게 먹을 수 있는 ...")
+- CRM 메세지 방향 한 줄
+
+[백년밥상 제품 목록]
+${products}
+
+추천 후 결과를 간결하게 정리해줘. 내가 직접 "최종 후보 상품" 필드에 옮겨 입력할 거야.`;
+
+  sendPromptOrAlert(prompt);
+
+  // Update status
+  document.getElementById('c1-skill-status').classList.add('visible');
+  markDone('c1');
+}
+
+
+// ══════════════════════════════════════
+//  🤖 자동 스킬 4: 시즌성 트렌드
+// ══════════════════════════════════════
+function triggerTrendSkill() {
+  const today     = new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+  const sendDate  = document.getElementById('sendDate').value;
+  const dateLabel = sendDate
+    ? new Date(sendDate + 'T00:00:00').toLocaleDateString('ko-KR', { month:'long', day:'numeric', weekday:'short' })
+    : '미정';
+  const products  = loadProductList();
+
+  const prompt =
+`[백년밥상 CRM — 시즌성 트렌드 서치 & 상품 추천]
+
+오늘: ${today}
+CRM 발송 예정일: ${dateLabel}
+
+Step 1 — 아래 채널들을 지금 직접 검색해서 이번 주 식품/밀키트 트렌드 키워드 3~5개를 추출해줘:
+- 마켓컬리: 주간 베스트, 이번 주 기획전 테마
+- 쿠팡 로켓프레시: 식품 카테고리 베스트 100
+- 인스타그램: #밀키트 #간편식 #집밥 최근 인기 게시물
+- 네이버 쇼핑: 식품 카테고리 급상승 키워드
+
+Step 2 — 추출된 트렌드 키워드를 기반으로, 아래 백년밥상 제품 목록에서 가장 잘 매칭되는 상품 2~3개를 추천해줘.
+
+[백년밥상 제품 목록]
+${products}
+
+결과 형식:
+① 이번 주 트렌드 키워드 (3~5개)
+② 추천 상품 + 트렌드 연결 근거 (각 한 줄)
+
+추천 후 결과를 간결하게 정리해줘. 내가 직접 "최종 후보 상품" 필드에 옮겨 입력할 거야.`;
+
+  sendPromptOrAlert(prompt);
+
+  // Update status
+  document.getElementById('c4-skill-status').classList.add('visible');
+  markDone('c4');
+}
+
+function sendPromptOrAlert(prompt) {
+  if (typeof sendPrompt === 'function') {
+    sendPrompt(prompt);
+  } else {
+    // Dev mode fallback
+    console.log('[sendPrompt preview]\n', prompt);
+    alert('[개발 환경] sendPrompt를 사용할 수 없습니다.\nConsole에서 프롬프트를 확인하세요.');
+  }
+}
+
+
+// ══════════════════════════════════════
+//  제품 목록 관리 (SheetJS 엑셀 업로드)
+// ══════════════════════════════════════
+let _parsedCatalogText = ''; // 파싱된 제품 목록 임시 저장
+
+function openCatalogModal() {
+  const existing = localStorage.getItem('crm_product_list');
+  if (existing && existing !== DEFAULT_PRODUCTS) {
+    // 이미 저장된 목록이 있으면 결과 뷰 표시
+    _parsedCatalogText = existing;
+    showCatalogResultView(existing, null);
+  } else {
+    resetCatalogUpload();
+  }
+  document.getElementById('catalog-modal').classList.add('open');
+}
+
+function resetCatalogUpload() {
+  _parsedCatalogText = '';
+  document.getElementById('catalog-upload-view').style.display = '';
+  document.getElementById('catalog-result-view').style.display = 'none';
+  document.getElementById('catalog-parse-error').style.display = 'none';
+  document.getElementById('catalog-file-input').value = '';
+  document.getElementById('catalog-save-btn').disabled = true;
+  document.getElementById('catalog-show-edit').checked = false;
+  document.getElementById('catalog-edit-area').style.display = 'none';
+}
+
+function handleCatalogFileInput(e) {
+  const file = e.target.files && e.target.files[0];
+  if (file) parseProductExcel(file);
+}
+
+function catalogDragOver(e) {
+  e.preventDefault();
+  document.getElementById('catalog-drop-zone').classList.add('dragover');
+}
+
+function catalogDragLeave(e) {
+  document.getElementById('catalog-drop-zone').classList.remove('dragover');
+}
+
+function catalogDrop(e) {
+  e.preventDefault();
+  document.getElementById('catalog-drop-zone').classList.remove('dragover');
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) parseProductExcel(file);
+}
+
+function categorizeSupplier(supplier) {
+  if (!supplier) return '산지직배송 제철 상품';
+  const s = String(supplier).trim();
+  if (s.includes('향천')) return '직접제조 및 매입 밀키트';
+  if (s === '10시 통영해담' || s === '15시 서온축산') return '냉장/육가공 밀키트';
+  return '산지직배송 제철 상품';
+}
+
+function parseProductExcel(file) {
+  const errorEl = document.getElementById('catalog-parse-error');
+  errorEl.style.display = 'none';
+
+  if (typeof XLSX === 'undefined') {
+    errorEl.textContent = 'SheetJS 라이브러리 로딩 실패. 새로고침 후 다시 시도하세요.';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+
+      // 시트 찾기 ('상품정보' 우선, 없으면 첫 번째 시트)
+      const sheetName = wb.SheetNames.includes('상품정보') ? '상품정보' : wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      if (!rows.length) throw new Error('시트에 데이터가 없습니다.');
+
+      // 컬럼명 확인 (첫 행으로 매핑)
+      const sample = rows[0];
+      const nameKey    = Object.keys(sample).find(k => k.includes('상품명')) || '상품명';
+      const supplierKey= Object.keys(sample).find(k => k.includes('공급사')) || '공급사명';
+      const activeKey  = Object.keys(sample).find(k => k.includes('상품사용') || k.includes('사용여부')) || '상품사용여부';
+      const priceKey   = Object.keys(sample).find(k => k.includes('소비자가') || k.includes('판매가')) || '소비자가';
+
+      // 필터: 사용 중 상품만 (Y)
+      const active = rows.filter(r => String(r[activeKey]).trim().toUpperCase() === 'Y');
+
+      // 상품명 기준 중복 제거
+      const seen = new Set();
+      const deduped = active.filter(r => {
+        const nm = String(r[nameKey] || '').trim();
+        if (!nm || seen.has(nm)) return false;
+        seen.add(nm);
+        return true;
+      });
+
+      // 카테고리별 분류
+      const cats = {
+        '산지직배송 제철 상품': [],
+        '직접제조 및 매입 밀키트': [],
+        '냉장/육가공 밀키트': []
+      };
+      deduped.forEach(r => {
+        const nm  = String(r[nameKey] || '').trim();
+        const sup = String(r[supplierKey] || '').trim();
+        const cat = categorizeSupplier(sup);
+        const price = r[priceKey] ? parseInt(r[priceKey]) : 0;
+        cats[cat].push({ nm, price });
+      });
+
+      // 텍스트 포맷 생성
+      const lines = [];
+      ['산지직배송 제철 상품', '직접제조 및 매입 밀키트', '냉장/육가공 밀키트'].forEach(cat => {
+        const items = cats[cat];
+        if (!items.length) return;
+        lines.push(`[${cat}]`);
+        items.forEach(({ nm, price }) => {
+          lines.push(price > 0 ? `· ${nm} (${price.toLocaleString()}원)` : `· ${nm}`);
+        });
+        lines.push('');
+      });
+
+      const text = lines.join('\n').trim();
+      _parsedCatalogText = text;
+
+      // 결과 표시
+      const counts = {
+        '산지직배송': cats['산지직배송 제철 상품'].length,
+        '직접제조 밀키트': cats['직접제조 및 매입 밀키트'].length,
+        '냉장/육가공': cats['냉장/육가공 밀키트'].length,
+      };
+      const total = deduped.length;
+      showCatalogResultView(text, { counts, total, fileName: file.name, sheetName });
+
+    } catch(err) {
+      errorEl.textContent = '파싱 오류: ' + err.message;
+      errorEl.style.display = 'block';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function showCatalogResultView(text, meta) {
+  document.getElementById('catalog-upload-view').style.display = 'none';
+  document.getElementById('catalog-result-view').style.display = '';
+  document.getElementById('catalog-save-btn').disabled = false;
+  document.getElementById('catalog-textarea').value = text;
+
+  if (meta) {
+    const { counts, total, fileName } = meta;
+    document.getElementById('catalog-success-text').textContent =
+      `${fileName || '제품 목록'} — 총 ${total}개 상품 불러오기 완료`;
+
+    const grid = document.getElementById('catalog-count-grid');
+    grid.innerHTML = [
+      ['산지직배송', counts['산지직배송'] || 0, '산지직배송\n제철 상품'],
+      ['직접제조 밀키트', counts['직접제조 밀키트'] || 0, '직접제조 및\n매입 밀키트'],
+      ['냉장/육가공', counts['냉장/육가공'] || 0, '냉장/육가공\n밀키트'],
+    ].map(([,num,label]) => `
+      <div class="catalog-count-card">
+        <div class="count-num">${num}</div>
+        <div class="count-label" style="white-space:pre-line">${label}</div>
+      </div>
+    `).join('');
+  } else {
+    // 기존 저장 목록 — 파일명 없이 표시
+    const lineCount = text.split('\n').filter(l => l.startsWith('·')).length;
+    document.getElementById('catalog-success-text').textContent =
+      `저장된 제품 목록 — ${lineCount}개 상품`;
+    document.getElementById('catalog-count-grid').innerHTML = '';
+  }
+
+  document.getElementById('catalog-show-edit').checked = false;
+  document.getElementById('catalog-edit-area').style.display = 'none';
+}
+
+function toggleCatalogEdit() {
+  const show = document.getElementById('catalog-show-edit').checked;
+  document.getElementById('catalog-edit-area').style.display = show ? '' : 'none';
+}
+
+function saveCatalog() {
+  // 편집 모드가 열려 있으면 textarea 값 사용, 아니면 파싱 텍스트
+  const editOpen = document.getElementById('catalog-show-edit').checked;
+  const val = editOpen
+    ? (document.getElementById('catalog-textarea').value.trim())
+    : _parsedCatalogText;
+
+  if (!val) { alert('제품 목록이 비어 있습니다.'); return; }
+  localStorage.setItem('crm_product_list', val);
+  closeModal('catalog-modal');
+  showToast('제품 목록이 저장되었습니다.');
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:1.5rem;right:2rem;background:#141413;color:#faf9f5;font-family:Poppins,sans-serif;font-size:0.8125rem;padding:0.625rem 1.125rem;border-radius:6px;z-index:999;opacity:1;transition:opacity 0.3s';
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2200);
+}
+
+
+// ══════════════════════════════════════
+//  🤖 최종 상품 우선순위 추천
+// ══════════════════════════════════════
+function triggerRankingSkill() {
+  const p1n = document.getElementById('p1-name').value.trim();
+  const p2n = document.getElementById('p2-name').value.trim();
+  if (!p1n) { alert('후보 상품을 최소 1개 이상 입력해 주세요.'); return; }
+
+  const p2r = document.getElementById('p2-reason').value.trim();
+  const p3n = document.getElementById('p3-name').value.trim();
+  const p1r = document.getElementById('p1-reason').value.trim();
+  const p3r = document.getElementById('p3-reason').value.trim();
+
+  const dateVal = document.getElementById('sendDate').value;
+  const sendDt  = dateVal ? new Date(dateVal + 'T00:00:00') : null;
+  const dateLabel = sendDt
+    ? sendDt.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long' })
+    : '미정';
+  const dayOfWeek = sendDt
+    ? sendDt.toLocaleDateString('ko-KR', { weekday:'long' })
+    : '미정';
+
+  const weather  = document.getElementById('c1-weather').value || '미입력';
+  const c2prod   = document.getElementById('c2-product').value.trim() || '없음';
+  const c3prod   = document.getElementById('c3-product').value.trim() || '없음';
+  const c4memo   = document.getElementById('c4-result').value.trim() || '없음';
+  const hasPromo = document.getElementById('c5-has-promo').checked;
+  const c5promo  = hasPromo ? (document.getElementById('c5-promo').value.trim() || '있음') : '없음';
+
+  const typeMap = {
+    'A_단일프로모션':'A. 단일 상품 프로모션',
+    'B_등급별혜택':  'B. 등급별 혜택',
+    'C_복수제품추천':'C. 복수 제품 큐레이션',
+    'D_시즌후킹':   'D. 시즌 후킹'
+  };
+  const crmType = typeMap[selectedCRMType] || '미정';
+
+  // Build candidate list
+  const candidates = [];
+  if (p1n) candidates.push(`① ${p1n}${p1r ? ' — ' + p1r : ''}`);
+  if (p2n) candidates.push(`② ${p2n}${p2r ? ' — ' + p2r : ''}`);
+  if (p3n) candidates.push(`③ ${p3n}${p3r ? ' — ' + p3r : ''}`);
+
+  const prompt =
+`[백년밥상 CRM — 최종 후보 상품 우선순위 추천]
+
+발송 예정일: ${dateLabel}
+발송 요일: ${dayOfWeek}
+CRM 유형: ${crmType}
+
+[5가지 선정 기준 결과]
+- 날씨 소구: ${weather}
+- 재구매 유도 후보: ${c2prod}
+- 신제품 소개: ${c3prod}
+- 시즌 트렌드 메모: ${c4memo}
+- 프로모션: ${c5promo}
+
+[최종 후보 상품]
+${candidates.join('\n')}
+
+---
+
+위 후보 상품들을 아래 4가지 기준을 종합 분석해서 1순위 → 2순위 → 3순위로 추천해줘.
+
+[분석 기준]
+1. 발송 요일 심리: ${dayOfWeek} 카카오톡 수신자의 구매 행동 패턴과 심리 상태
+   (예: 월요일 = 한 주 시작 다짐형 / 금요일 = 주말 준비·보상 심리 / 일요일 = 다음 주 장보기·집밥 계획)
+2. 날씨 소구력: "${weather}" 날씨와 각 상품의 연결 강도 — 날씨가 구매 트리거가 되는가
+3. 고객 구매 심리 총합: 재구매 주기 도달 여부, 신제품 호기심, 트렌드 합류 욕구, 시즌 적합성
+4. CRM 유형 적합성: ${crmType} 포맷에 가장 잘 맞는 상품 구조인가
+
+[응답 형식]
+🥇 1순위: [상품명]
+ - 추천 이유: (핵심 2줄)
+ - CRM 메세지 방향: (한 줄)
+
+🥈 2순위: [상품명]
+ - 추천 이유: (핵심 2줄)
+ - CRM 메세지 방향: (한 줄)
+
+🥉 3순위: [상품명]
+ - 추천 이유: (핵심 2줄)
+ - CRM 메세지 방향: (한 줄)
+
+📌 종합 판단 코멘트: (이번 발송에서 1순위를 선택해야 하는 이유 1~2줄)`;
+
+  sendPromptOrAlert(prompt);
+  document.getElementById('ranking-skill-status').classList.add('visible');
+}
+
+
+// ══════════════════════════════════════
+//  CRM 작성 탭으로 이동 (pre-fill)
+// ══════════════════════════════════════
+function goToCRMTab() {
+  const p1 = document.getElementById('p1-name').value.trim();
+  if (p1) document.getElementById('crm-product').value = p1;
+  if (selectedCRMType) document.getElementById('crm-type').value = selectedCRMType;
+
+  const weather = document.getElementById('c1-weather').value;
+  const trend   = document.getElementById('c4-result').value;
+  const hasPromo= document.getElementById('c5-has-promo').checked;
+  const promo   = document.getElementById('c5-promo').value;
+  const parts   = [];
+  if (weather) parts.push('날씨: ' + weather);
+  if (trend)   parts.push('트렌드: ' + trend);
+  if (hasPromo && promo) parts.push('프로모션: ' + promo);
+  if (parts.length) document.getElementById('crm-context').value = parts.join(' / ');
+
+  switchTab(3);
+}
+
+
+// ══════════════════════════════════════
+//  Discount
+// ══════════════════════════════════════
+function toggleDiscount() {
+  document.getElementById('discount-fields').className = document.getElementById('has-discount').checked ? 'visible' : '';
+}
+
+function calcDiscount() {
+  const orig = parseFloat(document.getElementById('crm-orig').value);
+  const sale = parseFloat(document.getElementById('crm-sale').value);
+  const el   = document.getElementById('price-calc');
+  if (orig > 0 && sale > 0 && sale < orig) {
+    el.textContent = `할인율 ${Math.round((1-sale/orig)*100)}% · 절약 ${(orig-sale).toLocaleString()}원 · 최종가 ${sale.toLocaleString()}원`;
+    el.style.display = 'inline-block';
+  } else { el.style.display = 'none'; }
+}
+
+
+// ══════════════════════════════════════
+//  CRM 메세지 생성 → sendPrompt
+// ══════════════════════════════════════
+function startCRMGeneration() {
+  const product  = document.getElementById('crm-product').value.trim();
+  const category = document.getElementById('crm-category').value;
+  const sendDate = document.getElementById('crm-senddate').value;
+  const sendTime = document.getElementById('crm-sendtime').value;
+  const channel  = document.getElementById('crm-channel').value;
+  const crmType  = document.getElementById('crm-type').value;
+  const segment  = document.getElementById('crm-segment').value;
+  const url      = document.getElementById('crm-url').value.trim();
+  const context  = document.getElementById('crm-context').value.trim();
+  const hasDisc  = document.getElementById('has-discount').checked;
+  const origP    = document.getElementById('crm-orig').value;
+  const saleP    = document.getElementById('crm-sale').value;
+  const coupon   = document.getElementById('crm-coupon').value.trim();
+
+  if (!product)  { alert('제품명을 입력하세요.'); return; }
+  if (!sendDate) { alert('발송 예정일을 입력하세요.'); return; }
+  if (!crmType)  { alert('CRM 유형을 선택하세요.'); return; }
+
+  const dateLabel = new Date(sendDate + 'T00:00:00')
+    .toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+
+  let discLine = '없음';
+  if (hasDisc) {
+    const p = [];
+    if (origP) p.push('정가 ' + parseInt(origP).toLocaleString() + '원');
+    if (saleP) p.push('판매가 ' + parseInt(saleP).toLocaleString() + '원');
+    if (origP && saleP) p.push('할인율 ' + Math.round((1-saleP/origP)*100) + '%');
+    if (coupon) p.push(coupon);
+    discLine = p.join(' / ') || '있음 (상세 미입력)';
+  }
+
+  const prompt =
+`CRM 메세지 생성 시작해줘.
+
+[STEP 0 — 기본 정보]
+제품명: ${product}
+카테고리: ${category || '미입력'}
+발송 예정일: ${dateLabel}${sendTime ? ' (' + sendTime + ')' : ''}
+채널: ${channel}
+할인/프로모션: ${discLine}
+CRM 유형: ${crmType}
+타겟 세그먼트: ${segment}
+랜딩 URL: ${url || '미입력'}
+추가 배경/소구 방향: ${context || '없음'}`;
+
+  sendPromptOrAlert(prompt);
+}
+
+
+// ══════════════════════════════════════
+//  PIPELINE
+// ══════════════════════════════════════
+function renderPipeline() {
+  const list  = document.getElementById('pipeline-list');
+  if (!pipeline.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>진행 중인 CRM이 없습니다.<br><strong>+ CRM 추가</strong> 버튼으로 추가하세요.</p></div>`;
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  list.innerHTML = pipeline.map((item, idx) => {
+    const send  = new Date(item.sendDate + 'T00:00:00'); send.setHours(0,0,0,0);
+    const diff  = Math.round((send - today) / 86400000);
+    const ddayT = diff >= 0 ? 'D-' + diff : 'D+' + Math.abs(diff);
+    const ddayC = diff >= 5 ? 'var(--green)' : diff >= 3 ? 'var(--yellow)' : 'var(--red)';
+    const label = send.toLocaleDateString('ko-KR', { month:'short', day:'numeric', weekday:'short' });
+    const steps = STEP_LABELS.map((l, si) => {
+      let cls = si < item.step ? 'done' : si === item.step ? ((diff < 3 && si < 2) ? 'overdue' : 'current') : 'pending';
+      return `<div class="step-item ${cls}">${l}</div>`;
+    }).join('');
+    const g1 = item.step >= 1 ? 'ok' : (diff <= 5 ? 'warn' : 'ok');
+    const g2 = diff >= 3 || item.step >= 2 ? 'ok' : 'fail';
+    return `
+      <div class="pipeline-card">
+        <div class="pipeline-card-header">
+          <div><div class="pipeline-product">${item.product}</div><div class="pipeline-meta">발송일: ${label} · ${STEP_LABELS[item.step]}</div></div>
+          <div style="display:flex;align-items:center;gap:.75rem;">
+            <div class="pipeline-dday" style="color:${ddayC}">${ddayT}</div>
+            <button onclick="removePipeline(${idx})" title="삭제" style="background:none;border:none;cursor:pointer;color:var(--text-muted);">🗑</button>
+          </div>
+        </div>
+        <div class="step-track">${steps}</div>
+        <div class="pipeline-footer">
+          <span class="gate-tag ${g1}">G1 ${g1==='ok'?'✓':'⚠'}</span>
+          <span class="gate-tag ${g2}">G2 ${g2==='ok'?'✓':'✗'}</span>
+          <span class="gate-tag ok">G3 ✓</span>
+          <span style="flex:1"></span>
+          ${item.step < STEP_LABELS.length-1
+            ? `<button class="btn btn-secondary btn-sm" onclick="advanceStep(${idx})">단계 완료 →</button>`
+            : `<span style="font-family:Poppins,sans-serif;font-size:.75rem;color:var(--green-text);font-weight:600">✅ 발송 완료</span>`}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function advanceStep(idx) {
+  if (pipeline[idx].step < STEP_LABELS.length - 1) { pipeline[idx].step++; persist(); renderPipeline(); }
+}
+function removePipeline(idx) {
+  if (confirm('"' + pipeline[idx].product + '" CRM을 삭제하시겠습니까?')) { pipeline.splice(idx, 1); persist(); renderPipeline(); }
+}
+function persist() { localStorage.setItem('crm_pipeline_v2', JSON.stringify(pipeline)); }
+function openAddModal() {
+  document.getElementById('add-product').value = '';
+  document.getElementById('add-date').value = document.getElementById('sendDate').value || nextSunday();
+  document.getElementById('add-step').value = '0';
+  document.getElementById('add-modal').classList.add('open');
+}
+function savePipeline() {
+  const product  = document.getElementById('add-product').value.trim();
+  const sendDate = document.getElementById('add-date').value;
+  const step     = parseInt(document.getElementById('add-step').value);
+  if (!product || !sendDate) { alert('상품명과 발송 예정일을 입력하세요.'); return; }
+  pipeline.push({ product, sendDate, step });
+  persist(); renderPipeline(); closeModal('add-modal');
+}
+
+
+// ══════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+</script>
+
+</body>
+</html>
