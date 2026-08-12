@@ -1,0 +1,369 @@
+/* ============================================================================
+   PRESET AI SYSTEM — 공용 디자인 시스템 (껍데기)
+   GLO:UP 마케팅 · 프리셋 AI 시스템 템플릿
+   ----------------------------------------------------------------------------
+   신규 클라이언트 AI 시스템을 만들 때 이 파일은 그대로 재사용하고,
+   아래 [BRAND TOKENS] 블록의 값만 클라이언트에 맞게 교체하면 됩니다.
+   무드: 뉴트럴 그레이 (GPT/Claude 계열) — 무채색 베이스 + 최소 액센트.
+   ============================================================================ */
+
+/* ─────────────────────────────────────────────────────────────
+   [BRAND TOKENS]  ← 클라이언트마다 이 블록만 교체
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* 브랜드 강조색: 로고 마크·포커스 등 극히 제한적으로만 사용 */
+  --brand: #c2603f;              /* 백년밥상 웜톤 (거의 안 보이게 절제) */
+  --brand-soft: #faf1ec;
+
+  /* 폰트 — Pretendard(웹) → 시스템 산세리프 폴백 */
+  --font-sans: "Pretendard Variable", "Pretendard", -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto,
+    "Helvetica Neue", "Malgun Gothic", sans-serif;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   [CORE TOKENS]  ← 시스템 공통. 웬만하면 건드리지 않음
+   ───────────────────────────────────────────────────────────── */
+:root {
+  /* 표면 */
+  --bg: #ffffff;
+  --bg-subtle: #f7f7f8;          /* 패널·hover 바닥 */
+  --bg-sunken: #f0f0f1;
+  --surface: #ffffff;
+
+  /* 경계선 */
+  --border: #ececec;
+  --border-strong: #d9d9dc;
+
+  /* 텍스트 */
+  --text: #0d0d0d;
+  --text-secondary: #52525b;
+  --text-muted: #8e8e9a;
+  --text-faint: #b4b4bd;
+
+  /* 상태색 (무채색 베이스에서 유일하게 허용되는 컬러 — 아주 절제) */
+  --live: #10a37f;               /* 가동 중 (subtle green) */
+  --live-soft: #e7f6f1;
+  --warn: #b7791f;
+  --warn-soft: #fbf3e4;
+  --danger: #c0392b;
+  --danger-soft: #fbeceb;
+
+  /* 프라이머리 액션 = 잉크 블랙 (GPT/Claude 계열) */
+  --ink: #0d0d0d;
+  --ink-hover: #262626;
+  --on-ink: #ffffff;
+
+  /* 반경 */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  /* 그림자 — 거의 없음. hover에서만 아주 미세하게 */
+  --shadow-hover: 0 1px 2px rgba(0,0,0,.04), 0 12px 28px -12px rgba(0,0,0,.12);
+
+  /* 레이아웃 */
+  --maxw: 1040px;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESET & BASE
+   ───────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.011em;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; }
+svg { display: block; }
+::selection { background: rgba(16,163,127,.16); }
+
+/* ─────────────────────────────────────────────────────────────
+   TOPBAR — 라이트, 헤어라인 하단선 (다크 히어로 폐기)
+   ───────────────────────────────────────────────────────────── */
+.ps-topbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 var(--gutter);
+  background: rgba(255,255,255,.85);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.ps-brand { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.ps-mark {
+  width: 30px; height: 30px;
+  border-radius: 9px;
+  display: grid; place-items: center;
+  background: var(--brand);   /* 브랜드 액센트 — 마크에만 살림 */
+  color: #fff;
+  flex-shrink: 0;
+}
+.ps-mark svg { width: 17px; height: 17px; }
+.ps-brand-text { min-width: 0; }
+.ps-brand-title {
+  font-size: .9375rem; font-weight: 600; letter-spacing: -.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ps-brand-sub {
+  font-size: .75rem; color: var(--text-muted); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ps-topbar-right {
+  text-align: right; font-size: .75rem; color: var(--text-muted);
+  line-height: 1.5; flex-shrink: 0;
+}
+.ps-topbar-right strong { color: var(--text-secondary); font-weight: 500; }
+
+/* topbar 내 뒤로가기/보조 링크 */
+.ps-back {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .8125rem; color: var(--text-secondary);
+  padding: .4rem .7rem; border-radius: var(--r-sm);
+  transition: background .15s, color .15s;
+}
+.ps-back:hover { background: var(--bg-subtle); color: var(--text); }
+.ps-back svg { width: 15px; height: 15px; }
+
+/* ─────────────────────────────────────────────────────────────
+   HERO — 검색 우선 (헤드라인 없이 바로 검색창)
+   ───────────────────────────────────────────────────────────── */
+.ps-hero {
+  max-width: 620px; width: 100%; margin: 0 auto;
+  padding: clamp(3rem, 9vw, 6rem) var(--gutter) clamp(2rem, 4vw, 3rem);
+  text-align: center;
+}
+.ps-search { position: relative; }
+.ps-search-icon {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  color: var(--text-muted); pointer-events: none;
+}
+.ps-search-icon svg { width: 19px; height: 19px; }
+.ps-search input {
+  width: 100%; height: 56px;
+  padding: 0 1.25rem 0 3rem;
+  font-family: var(--font-sans); font-size: 1rem; color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  transition: border-color .15s, box-shadow .15s;
+}
+.ps-search input::placeholder { color: var(--text-muted); }
+.ps-search input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-soft);
+}
+.ps-hero-helper {
+  margin-top: .875rem;
+  font-size: .875rem; color: var(--text-muted);
+}
+
+/* 카테고리 필터 칩 — 항목이 있는 카테고리만 렌더됨 */
+.ps-cats {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin-top: 1.5rem;
+}
+.ps-cat {
+  font-family: var(--font-sans);
+  font-size: .8125rem; font-weight: 500; color: var(--text-secondary);
+  padding: .4rem .9rem; border-radius: var(--r-pill);
+  border: 1px solid var(--border-strong); background: var(--surface);
+  cursor: pointer; transition: background .15s, color .15s, border-color .15s;
+}
+.ps-cat:hover { background: var(--bg-subtle); color: var(--text); }
+.ps-cat.active { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+
+/* 라이브 도트 — 정적, pulse 애니메이션 없음 (절제) */
+.ps-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-faint); flex-shrink: 0;
+}
+.ps-dot.live { background: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+.ps-dot.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
+
+/* ─────────────────────────────────────────────────────────────
+   SECTION LABEL
+   ───────────────────────────────────────────────────────────── */
+.ps-section {
+  max-width: var(--maxw); width: 100%; margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+.ps-section-label {
+  font-size: .75rem; font-weight: 500; color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MODULE GRID + CARD — 플랫, 헤어라인, hover에서만 미세 반응
+   ───────────────────────────────────────────────────────────── */
+.ps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.ps-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.ps-card.is-live { cursor: pointer; }
+.ps-card.is-live:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.ps-card.is-soon { background: var(--bg-subtle); }
+.ps-card.is-soon .ps-card-icon { opacity: .5; }
+.ps-card.is-soon .ps-card-title { color: var(--text-secondary); }
+
+.ps-card-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: .75rem; margin-bottom: 1.1rem;
+}
+/* 라인 아이콘 — 컬러 타일 대신 얇은 스트로크, 단색 */
+.ps-card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: grid; place-items: center;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text);
+  flex-shrink: 0;
+}
+.ps-card-icon svg { width: 20px; height: 20px; stroke-width: 1.6; }
+
+/* 조용한 상태 태그 (도트 + 라벨) */
+.ps-status {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .75rem; font-weight: 500; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.ps-status.live { color: var(--brand); }
+
+.ps-card-title {
+  font-size: 1.0625rem; font-weight: 600; letter-spacing: -.02em;
+  color: var(--text); margin-bottom: .4rem;
+}
+.ps-card-desc {
+  font-size: .875rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* feature — 칩 남발 대신 · 로 구분된 조용한 텍스트 라인 */
+.ps-card-features {
+  margin-top: .875rem;
+  font-size: .8125rem; color: var(--text-muted); line-height: 1.7;
+}
+.ps-card-features .sep { color: var(--border-strong); margin: 0 .5rem; }
+
+.ps-card-foot {
+  margin-top: auto; padding-top: 1.25rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+/* 큰 필드 버튼 대신 텍스트 링크형 액션 */
+.ps-action {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .875rem; font-weight: 500; color: var(--text);
+  transition: gap .18s ease;
+}
+.ps-card.is-live:hover .ps-action { gap: .65rem; }
+.ps-action svg { width: 16px; height: 16px; }
+.ps-action.disabled { color: var(--text-faint); font-weight: 400; }
+
+/* 진행 단계 스트립 (파이프라인) — 얇은 세그먼트 바 */
+.ps-steps { display: flex; gap: 3px; margin-top: 1rem; }
+.ps-step { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--bg-sunken); }
+.ps-step.done { background: var(--text); }
+.ps-step.active { background: var(--brand); }
+
+/* ─────────────────────────────────────────────────────────────
+   KB 검색 결과 / 빈 상태
+   ───────────────────────────────────────────────────────────── */
+.ps-kb { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.ps-kb-row {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .875rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: border-color .15s, background .15s;
+  cursor: pointer;
+}
+.ps-kb-row:hover { border-color: var(--border-strong); background: var(--bg-subtle); }
+.ps-kb-row svg { width: 17px; height: 17px; color: var(--text-muted); flex-shrink: 0; }
+.ps-kb-title { font-size: .875rem; font-weight: 500; color: var(--text); }
+.ps-kb-desc { font-size: .8125rem; color: var(--text-muted); }
+.ps-kb-tag {
+  margin-left: auto; font-size: .6875rem; color: var(--text-muted);
+  padding: .15rem .55rem; border: 1px solid var(--border); border-radius: var(--r-pill);
+}
+.ps-empty {
+  padding: 3rem 1rem; text-align: center;
+  font-size: .9375rem; color: var(--text-muted);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BUTTONS (앱 화면 공통)
+   ───────────────────────────────────────────────────────────── */
+.ps-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  font-size: .875rem; font-weight: 500; letter-spacing: -.01em;
+  padding: .6rem 1.1rem; border-radius: var(--r-sm);
+  border: 1px solid transparent; cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+  white-space: nowrap;
+}
+.ps-btn svg { width: 16px; height: 16px; }
+.ps-btn-primary { background: var(--ink); color: var(--on-ink); }
+.ps-btn-primary:hover { background: var(--ink-hover); }
+.ps-btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+.ps-btn-secondary:hover { background: var(--bg-subtle); }
+.ps-btn-ghost { background: transparent; color: var(--text-secondary); }
+.ps-btn-ghost:hover { background: var(--bg-subtle); color: var(--text); }
+.ps-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ─────────────────────────────────────────────────────────────
+   FOOTER
+   ───────────────────────────────────────────────────────────── */
+.ps-footer {
+  max-width: var(--maxw); width: 100%; margin: 0 auto;
+  padding: 1.5rem var(--gutter);
+  margin-top: auto;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: .8125rem; color: var(--text-muted);
+}
+.ps-footer .right { display: inline-flex; align-items: center; gap: .5rem; }
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .ps-grid { grid-template-columns: 1fr; }
+  .ps-topbar-right { display: none; }
+  .ps-intro p { font-size: 1rem; }
+}

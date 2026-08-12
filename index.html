@@ -4,588 +4,271 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>백년밥상 AI 시스템</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #faf9f5;
-      --surface: #ffffff;
-      --border: #e8e6dc;
-      --text: #141413;
-      --text-muted: #9a9890;
-      --accent: #d97757;
-      --accent-hover: #c4613f;
-      --accent-light: rgba(217,119,87,0.08);
-      --accent-border: rgba(217,119,87,0.22);
-      --green: #788c5d;
-      --green-bg: #eef2e8;
-      --green-text: #516244;
-      --green-border: rgba(120,140,93,0.25);
-      --header-bg: #141413;
-      --header-text: #faf9f5;
-      --radius: 6px;
-      --radius-lg: 12px;
-      --radius-xl: 16px;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Lora', Georgia, serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ─── Header ─── */
-    .header {
-      background: var(--header-bg);
-      color: var(--header-text);
-      padding: 0 2rem;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.875rem;
-    }
-    .header-logo {
-      width: 28px;
-      height: 28px;
-      background: var(--accent);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.875rem;
-      flex-shrink: 0;
-    }
-    .header-brand h1 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.9375rem;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-    .header-brand .header-sub {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.6875rem;
-      opacity: 0.45;
-      margin-top: 0.1rem;
-    }
-    .header-right {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.7rem;
-      opacity: 0.5;
-      text-align: right;
-      line-height: 1.7;
-    }
-
-    /* ─── Hero band ─── */
-    .hero {
-      background: linear-gradient(135deg, #1a1915 0%, #2a2820 50%, #1e1c17 100%);
-      padding: 3rem 2rem 2.75rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 60% 80% at 50% 120%, rgba(217,119,87,0.18) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-tag {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.625rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      background: rgba(217,119,87,0.12);
-      border: 1px solid rgba(217,119,87,0.28);
-      border-radius: 99px;
-      padding: 0.25rem 0.875rem;
-      display: inline-block;
-      margin-bottom: 1.125rem;
-    }
-    .hero h2 {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #faf9f5;
-      letter-spacing: -0.025em;
-      line-height: 1.25;
-      margin-bottom: 0.625rem;
-    }
-    .hero h2 span { color: var(--accent); }
-    .hero p {
-      font-size: 0.875rem;
-      color: rgba(250,249,245,0.5);
-      line-height: 1.65;
-    }
-
-    /* ─── Phase badge row ─── */
-    .phase-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.375rem;
-      margin-top: 1.375rem;
-      flex-wrap: wrap;
-    }
-    .phase-dot {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.625rem;
-      font-weight: 600;
-      padding: 0.2rem 0.625rem;
-      border-radius: 99px;
-      letter-spacing: 0.04em;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-    }
-    .phase-dot.live  { background: rgba(120,140,93,0.2); color: #8baa6b; border: 1px solid rgba(120,140,93,0.3); }
-    .phase-dot.soon  { background: rgba(217,119,87,0.1); color: rgba(217,119,87,0.7); border: 1px solid rgba(217,119,87,0.2); }
-    .phase-dot.plan  { background: rgba(255,255,255,0.04); color: rgba(250,249,245,0.3); border: 1px solid rgba(255,255,255,0.08); }
-    .phase-sep { color: rgba(255,255,255,0.15); font-size: 0.7rem; }
-
-    /* ─── Main grid ─── */
-    .main {
-      flex: 1;
-      padding: 2rem 2rem 3.5rem;
-      max-width: 980px;
-      width: 100%;
-      margin: 0 auto;
-    }
-    .section-label {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.625rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .card-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-    }
-
-    /* ─── AI 카드 ─── */
-    .ai-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
-      position: relative;
-    }
-    .ai-card.live {
-      cursor: pointer;
-    }
-    .ai-card.live:hover {
-      box-shadow: 0 8px 32px rgba(0,0,0,0.09);
-      border-color: rgba(217,119,87,0.3);
-      transform: translateY(-2px);
-    }
-    .ai-card.soon { opacity: 0.72; }
-
-    /* card top bar */
-    .card-top {
-      padding: 1.375rem 1.375rem 0;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-    .card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-    }
-    .icon-orange { background: rgba(217,119,87,0.1); }
-    .icon-blue   { background: rgba(82,130,217,0.1); }
-    .icon-green  { background: rgba(120,140,93,0.12); }
-    .icon-purple { background: rgba(140,100,200,0.1); }
-
-    /* status badge */
-    .status-badge {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.575rem;
-      font-weight: 700;
-      padding: 0.2rem 0.6rem;
-      border-radius: 99px;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .badge-live   { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-border); }
-    .badge-soon   { background: rgba(217,119,87,0.1); color: var(--accent); border: 1px solid var(--accent-border); }
-    .badge-plan   { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
-
-    /* card body */
-    .card-body {
-      padding: 0.875rem 1.375rem 0;
-      flex: 1;
-    }
-    .card-title {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: -0.015em;
-      line-height: 1.3;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-    .card-desc {
-      font-size: 0.8125rem;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    /* feature chips */
-    .card-features {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.3rem;
-      margin-top: 0.875rem;
-    }
-    .feature-chip {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.6125rem;
-      font-weight: 500;
-      padding: 0.2rem 0.6rem;
-      border-radius: 99px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-    .feature-chip.active {
-      background: var(--accent-light);
-      border-color: var(--accent-border);
-      color: var(--accent);
-    }
-
-    /* card footer */
-    .card-footer {
-      padding: 1rem 1.375rem 1.375rem;
-      margin-top: 0.875rem;
-    }
-    .btn-card {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      width: 100%;
-      padding: 0.625rem 1rem;
-      border-radius: var(--radius);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.375rem;
-      transition: all 0.15s;
-      text-decoration: none;
-    }
-    .btn-live {
-      background: var(--accent);
-      color: white;
-    }
-    .btn-live:hover { background: var(--accent-hover); }
-    .btn-soon {
-      background: var(--bg);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-      cursor: default;
-    }
-
-    /* live pulse dot */
-    .pulse-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      position: relative;
-      flex-shrink: 0;
-    }
-    .pulse-dot::after {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 1.5px solid var(--green);
-      opacity: 0;
-      animation: pulse 2s ease-out infinite;
-    }
-    @keyframes pulse {
-      0%   { opacity: 0.6; transform: scale(0.8); }
-      70%  { opacity: 0;   transform: scale(1.8); }
-      100% { opacity: 0;   transform: scale(1.8); }
-    }
-
-    /* ─── Progress strip (CRM card) ─── */
-    .card-progress {
-      margin: 0 1.375rem;
-      padding: 0.75rem;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-    }
-    .progress-label {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.6rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.4rem;
-    }
-    .progress-steps {
-      display: flex;
-      gap: 3px;
-    }
-    .progress-step {
-      flex: 1;
-      height: 5px;
-      border-radius: 99px;
-      background: var(--border);
-    }
-    .progress-step.done { background: var(--green); }
-    .progress-step.active { background: var(--accent); }
-
-    /* ─── Coming soon overlay ─── */
-    .coming-soon-overlay {
-      margin: 0 1.375rem;
-      padding: 0.625rem 0.875rem;
-      background: var(--bg);
-      border: 1px dashed var(--border);
-      border-radius: var(--radius);
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    /* ─── Footer ─── */
-    .footer {
-      border-top: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .footer-left {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-    }
-    .footer-right {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-    }
-  </style>
+  <meta name="description" content="백년밥상 마케팅 자동화 시스템">
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="preset-system.css">
 </head>
 <body>
 
-<!-- ══ HEADER ══ -->
-<header class="header">
-  <div class="header-brand">
-    <div class="header-logo">🍚</div>
-    <div>
-      <h1>백년밥상 AI 시스템</h1>
-      <div class="header-sub">D2C 밀키트 스토어 마케팅 자동화 플랫폼</div>
-    </div>
-  </div>
-  <div class="header-right">
-    <div id="today-date">—</div>
-    <div>GLO:UP × 백년밥상</div>
-  </div>
-</header>
+<!-- ══════════════════════════════════════════════════════════════
+     프리셋 AI 시스템 허브 — 화면 전체가 아래 SYSTEM config로 렌더됩니다.
+     신규 클라이언트용으로 복제할 때는 SYSTEM 객체만 교체하세요.
+     ══════════════════════════════════════════════════════════════ -->
 
-<!-- ══ HERO ══ -->
-<div class="hero">
-  <div class="hero-tag">AI System Dashboard</div>
-  <h2>데이터 기반 마케팅,<br><span>자동화로 실행</span>합니다</h2>
-  <p>ROI 시뮬레이션부터 CRM 발송까지 — 백년밥상 D2C 전 과정을 하나의 시스템으로</p>
-  <div class="phase-row">
-    <div class="phase-dot live">● LIVE</div>
-    <div class="phase-sep">·</div>
-    <div class="phase-dot soon">CRM 자동화 가동 중</div>
-    <div class="phase-sep">·</div>
-    <div class="phase-dot live">● 광고 대시보드 LIVE</div>
-    <div class="phase-sep">·</div>
-    <div class="phase-dot plan">ROI 시뮬레이터 준비 중</div>
-  </div>
-</div>
-
-<!-- ══ MAIN ══ -->
-<div class="main">
-
-  <div class="section-label">AI 모듈 — 4개 시스템</div>
-
-  <div class="card-grid">
-
-    <!-- ① CRM 자동화 OS — LIVE -->
-    <div class="ai-card live" onclick="window.location.href='crm-os.html'">
-      <div class="card-top">
-        <div class="card-icon icon-orange">💬</div>
-        <span class="status-badge badge-live">
-          <span style="display:inline-flex;align-items:center;gap:0.3rem;"><span class="pulse-dot"></span> Live</span>
-        </span>
-      </div>
-      <div class="card-body">
-        <div class="card-title">CRM 자동화 OS</div>
-        <div class="card-desc">상품 선정부터 카카오톡 발송까지. 날씨·트렌드 기반 AI 추천으로 주간 CRM 파이프라인 전체를 관리합니다.</div>
-        <div class="card-features">
-          <span class="feature-chip active">🤖 날씨 소구 추천</span>
-          <span class="feature-chip active">📈 트렌드 서치</span>
-          <span class="feature-chip active">🏆 우선순위 분석</span>
-          <span class="feature-chip active">📦 엑셀 제품 목록</span>
-          <span class="feature-chip active">게이트 현황</span>
-          <span class="feature-chip active">메세지 생성</span>
-        </div>
-      </div>
-      <div class="card-progress" style="margin-top:0.875rem;">
-        <div class="progress-label">CRM 파이프라인 단계</div>
-        <div class="progress-steps">
-          <div class="progress-step done" title="상품 선정"></div>
-          <div class="progress-step active" title="카피 작성"></div>
-          <div class="progress-step" title="이미지 제작"></div>
-          <div class="progress-step" title="디자인 완료"></div>
-          <div class="progress-step" title="소미 체크"></div>
-          <div class="progress-step" title="헤일리 세팅"></div>
-          <div class="progress-step" title="발송 완료"></div>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a class="btn-card btn-live" href="crm-os.html">
-          CRM OS 열기 →
-        </a>
-      </div>
-    </div>
-
-    <!-- ② ROI 시뮬레이션 대시보드 — 준비 중 -->
-    <div class="ai-card soon">
-      <div class="card-top">
-        <div class="card-icon icon-blue">📊</div>
-        <span class="status-badge badge-soon">준비 중</span>
-      </div>
-      <div class="card-body">
-        <div class="card-title">ROI 기반 시뮬레이션</div>
-        <div class="card-desc">광고비 투입 대비 예상 매출·ROAS·손익을 실시간으로 시뮬레이션. 채널별 예산 배분 최적안을 자동으로 제안합니다.</div>
-        <div class="card-features">
-          <span class="feature-chip">ROAS 예측</span>
-          <span class="feature-chip">채널별 예산 최적화</span>
-          <span class="feature-chip">손익 시뮬레이션</span>
-          <span class="feature-chip">목표 역산</span>
-        </div>
-      </div>
-      <div class="coming-soon-overlay" style="margin-top:0.875rem;">
-        🔒 &nbsp;빠른 시일 내 오픈 예정입니다
-      </div>
-      <div class="card-footer">
-        <button class="btn-card btn-soon" disabled>준비 중</button>
-      </div>
-    </div>
-
-    <!-- ③ 퍼포먼스 대시보드 — LIVE (헤일리) -->
-    <div class="ai-card live" onclick="window.open('https://hayley-create.github.io/100bs/', '_blank')">
-      <div class="card-top">
-        <div class="card-icon icon-green">📊</div>
-        <span class="status-badge badge-live">
-          <span style="display:inline-flex;align-items:center;gap:0.3rem;"><span class="pulse-dot"></span> Live</span>
-        </span>
-      </div>
-      <div class="card-body">
-        <div class="card-title">퍼포먼스 대시보드</div>
-        <div class="card-desc">주차별 매출·ROAS 추이, 채널별 일자별 성과, 캠페인 상세 및 주간 인사이트를 한눈에. 헤일리가 매주 업데이트합니다.</div>
-        <div class="card-features">
-          <span class="feature-chip active">📈 주차별 ROAS 추이</span>
-          <span class="feature-chip active">📦 채널별 매출</span>
-          <span class="feature-chip active">🎯 캠페인 상세</span>
-          <span class="feature-chip active">💡 주간 인사이트</span>
-        </div>
-      </div>
-      <div class="card-footer">
-        <a class="btn-card btn-live" href="https://hayley-create.github.io/100bs/" target="_blank">
-          퍼포먼스 대시보드 열기 →
-        </a>
-      </div>
-    </div>
-
-    <!-- ④ 광고 콘텐츠 인사이트 분석 — 준비 중 -->
-    <div class="ai-card soon">
-      <div class="card-top">
-        <div class="card-icon icon-purple">🎨</div>
-        <span class="status-badge badge-soon">준비 중</span>
-      </div>
-      <div class="card-body">
-        <div class="card-title">광고 콘텐츠 인사이트 분석 및 제안</div>
-        <div class="card-desc">소재별 성과 데이터를 분석해 어떤 비주얼·카피가 전환을 만드는지 파악. 다음 소재 방향을 AI가 자동 제안합니다.</div>
-        <div class="card-features">
-          <span class="feature-chip">소재 성과 분석</span>
-          <span class="feature-chip">카피 패턴 추출</span>
-          <span class="feature-chip">크리에이티브 제안</span>
-          <span class="feature-chip">A/B 인사이트</span>
-        </div>
-      </div>
-      <div class="coming-soon-overlay" style="margin-top:0.875rem;">
-        🔒 &nbsp;빠른 시일 내 오픈 예정입니다
-      </div>
-      <div class="card-footer">
-        <button class="btn-card btn-soon" disabled>준비 중</button>
-      </div>
-    </div>
-
-  </div>
-
-</div><!-- /main -->
-
-<!-- ══ FOOTER ══ -->
-<footer class="footer">
-  <div class="footer-left">백년밥상 AI 시스템 v1.0 · GLO:UP 마케팅</div>
-  <div class="footer-right">
-    <span class="pulse-dot" style="width:6px;height:6px;"></span>
-    CRM OS · 퍼포먼스 대시보드 가동 중
-  </div>
-</footer>
+<div id="app"></div>
 
 <script>
-  document.getElementById('today-date').textContent =
-    new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
-</script>
+/* ───────────────────────────────────────────────────────────────
+   [1] 아이콘 세트 — 얇은 라인 스트로크(단색). 이모지 사용 안 함.
+   ─────────────────────────────────────────────────────────────── */
+const ICON = {
+  bowl:      '<path d="M3 11h18M4 11a8 8 0 0 0 16 0M8 11V7a1 1 0 0 1 1-1M12 11V5M16 11V7a1 1 0 0 0-1-1"/>',
+  message:   '<path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/>',
+  trending:  '<path d="M3 17l6-6 4 4 8-8M21 7v5m0-5h-5"/>',
+  activity:  '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  sparkle:   '<path d="M12 3v4m0 10v4M5 12H1m22 0h-4M6.3 6.3 4 4m16 16-2.3-2.3M6.3 17.7 4 20M20 4l-2.3 2.3"/><circle cx="12" cy="12" r="3.2"/>',
+  arrow:     '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  lock:      '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  search:    '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  doc:       '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 3h9l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>',
+};
+function svg(name, cls) {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+    ${cls ? `class="${cls}"` : ''}>${ICON[name] || ''}</svg>`;
+}
 
+/* ───────────────────────────────────────────────────────────────
+   [2] SYSTEM CONFIG — 이 블록만 클라이언트에 맞게 교체
+       · brand.title : 시스템 이름
+       · maker       : 제작사 표기 (아주 작게)
+       · modules     : 상태 'live'가 자동으로 위로, 'soon'은 자동 하단
+       · knowledge   : 검색되는 자료(KB) 목록. 채우면 검색창에 노출됨
+   ─────────────────────────────────────────────────────────────── */
+const SYSTEM = {
+  brand: {
+    mark: 'bowl',
+    title: '백년밥상 AI 시스템',
+  },
+  maker: 'Created by FRISAT',
+  search: {
+    placeholder: '모듈이나 자료 검색',
+    helper: '필요한 모듈이나 자료를 검색해 보세요.',
+  },
+  // 카테고리 필터 — 항목(모듈/KB)이 1개 이상 있는 카테고리만 칩으로 노출됨.
+  // 순서·라벨은 여기서 조정. KB는 knowledge 배열이 채워지면 자동 표시.
+  categories: [
+    { key: 'dashboard',   label: '대시보드' },
+    { key: 'performance', label: '퍼포먼스' },
+    { key: 'content',     label: '콘텐츠' },
+    { key: 'admin',       label: '어드민' },
+    { key: 'kb',          label: 'KB' },
+  ],
+  modules: [
+    {
+      icon: 'message',
+      title: 'CRM 자동화 OS',
+      cat: 'admin',
+      desc: '상품 선정부터 카카오톡 발송까지 주간 CRM 파이프라인을 관리해요. 날씨·트렌드 기반으로 발송 상품을 추천합니다.',
+      features: ['날씨 소구 추천', '트렌드 서치', '우선순위 분석', '메시지 생성'],
+      status: 'live',
+      href: 'crm-os.html',
+      steps: ['done', 'active', '', '', '', '', ''],
+    },
+    {
+      icon: 'trending',
+      title: 'ROI 시뮬레이션',
+      cat: 'dashboard',
+      desc: '광고비 대비 예상 매출과 ROAS, 손익을 시뮬레이션해요. 채널별 예산 배분안도 함께 제안합니다.',
+      features: ['ROAS 예측', '예산 최적화', '손익 시뮬레이션', '목표 역산'],
+      status: 'soon',
+    },
+    {
+      icon: 'activity',
+      title: '퍼포먼스 대시보드',
+      cat: 'performance',
+      desc: '주차별 매출과 ROAS 추이, 채널·캠페인 성과를 한눈에 봅니다. 주간 인사이트도 매주 업데이트돼요.',
+      features: ['주차별 ROAS', '채널별 매출', '캠페인 상세', '주간 인사이트'],
+      status: 'live',
+      href: 'https://hayley-create.github.io/100bs/',
+      external: true,
+    },
+    {
+      icon: 'sparkle',
+      title: '콘텐츠 인사이트',
+      cat: 'content',
+      desc: '소재별 성과를 분석해 전환을 만드는 비주얼과 카피를 찾습니다. 다음 소재 방향도 제안해요.',
+      features: ['소재 성과 분석', '카피 패턴', '크리에이티브 제안', 'A/B 인사이트'],
+      status: 'soon',
+    },
+  ],
+  // 검색되는 자료(KB). 채우면 KB 카테고리 칩과 검색 결과에 자동 노출됨.
+  // 예: { title:'CRM 게이트 원칙', desc:'발송 전 체크리스트', tag:'가이드', href:'...' }
+  knowledge: [],
+  footer: {},
+};
+
+/* ───────────────────────────────────────────────────────────────
+   [3] 렌더러 — 아래는 건드릴 필요 없음
+   ─────────────────────────────────────────────────────────────── */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* 필터 상태 */
+const state = { q: '', cat: 'all' };
+
+/* 정렬: 이용 가능(live) 먼저, 준비 중(soon 등) 자동 하단. 그룹 내 순서 유지 */
+function ordered() {
+  return [...SYSTEM.modules].sort((a, b) =>
+    (a.status === 'live' ? 0 : 1) - (b.status === 'live' ? 0 : 1));
+}
+
+/* 카테고리별 항목 수 (모듈 + KB) */
+function catCounts() {
+  const c = {};
+  SYSTEM.modules.forEach(m => { c[m.cat] = (c[m.cat] || 0) + 1; });
+  (SYSTEM.knowledge || []).forEach(() => { c.kb = (c.kb || 0) + 1; });
+  return c;
+}
+/* 항목이 있는 카테고리만 반환 */
+function visibleCats() {
+  const c = catCounts();
+  return SYSTEM.categories.filter(x => (c[x.key] || 0) > 0);
+}
+function chipRow() {
+  const chips = [{ key: 'all', label: '전체' }, ...visibleCats()];
+  return chips.map(x =>
+    `<button class="ps-cat ${state.cat === x.key ? 'active' : ''}"
+       onclick="setCat('${x.key}')">${esc(x.label)}</button>`).join('');
+}
+function setCat(key) {
+  state.cat = key;
+  document.getElementById('ps-cats').innerHTML = chipRow();
+  update();
+}
+
+function moduleCard(m) {
+  const live = m.status === 'live';
+  const clickable = live && m.href;
+  const openAttr = clickable
+    ? (m.external
+        ? `onclick="window.open('${m.href}','_blank','noopener')"`
+        : `onclick="location.href='${m.href}'"`)
+    : '';
+
+  const features = `<div class="ps-card-features">${
+    m.features.map(esc).join('<span class="sep">·</span>')
+  }</div>`;
+
+  const steps = m.steps
+    ? `<div class="ps-steps">${m.steps.map(s =>
+        `<span class="ps-step ${s}"></span>`).join('')}</div>`
+    : '';
+
+  const action = live
+    ? `<span class="ps-action">열기 ${svg('arrow')}</span>`
+    : `<span class="ps-action disabled">${svg('lock')} 준비 중</span>`;
+
+  return `
+    <article class="ps-card ${live ? 'is-live' : 'is-soon'}" ${openAttr}>
+      <div class="ps-card-head">
+        <span class="ps-card-icon">${svg(m.icon)}</span>
+      </div>
+      <h3 class="ps-card-title">${esc(m.title)}</h3>
+      <p class="ps-card-desc">${esc(m.desc)}</p>
+      ${features}
+      ${steps}
+      <div class="ps-card-foot">${action}</div>
+    </article>`;
+}
+
+function kbRow(k) {
+  const open = k.href
+    ? `onclick="window.open('${k.href}','_blank','noopener')"` : '';
+  return `
+    <div class="ps-kb-row" ${open}>
+      ${svg('doc')}
+      <div>
+        <div class="ps-kb-title">${esc(k.title)}</div>
+        ${k.desc ? `<div class="ps-kb-desc">${esc(k.desc)}</div>` : ''}
+      </div>
+      ${k.tag ? `<span class="ps-kb-tag">${esc(k.tag)}</span>` : ''}
+    </div>`;
+}
+
+/* 카테고리 + 검색 필터 → 렌더 */
+function update() {
+  const query = state.q.trim().toLowerCase();
+  const cat = state.cat;
+  const label = document.getElementById('ps-label');
+  const kbBox = document.getElementById('ps-kb');
+  const grid  = document.getElementById('ps-grid');
+  const empty = document.getElementById('ps-empty');
+  const matchQ = t => !query || t.toLowerCase().includes(query);
+
+  // 모듈: 카테고리 일치(전체거나 같은 cat) + 검색어 일치. 'kb' 선택 시 모듈 없음
+  const mods = (cat === 'kb') ? [] : ordered().filter(m =>
+    (cat === 'all' || m.cat === cat) &&
+    matchQ(m.title + ' ' + m.desc + ' ' + m.features.join(' ')));
+
+  // KB: 'kb' 카테고리이거나, 전체+검색 중일 때 노출
+  const kbSource = (cat === 'kb' || (cat === 'all' && query))
+    ? (SYSTEM.knowledge || []) : [];
+  const kbs = kbSource.filter(k =>
+    matchQ(k.title + ' ' + (k.desc || '') + ' ' + (k.tag || '')));
+
+  const catLabel = (SYSTEM.categories.find(c => c.key === cat) || {}).label;
+  label.textContent = query ? '검색 결과'
+    : (cat === 'all' ? 'AI 모듈' : catLabel);
+  kbBox.innerHTML = kbs.map(kbRow).join('');
+  grid.innerHTML  = mods.map(moduleCard).join('');
+  empty.innerHTML = (mods.length === 0 && kbs.length === 0)
+    ? `<div class="ps-empty">${query ? '검색 결과가 없어요.' : '항목이 없어요.'}</div>` : '';
+}
+
+function render() {
+  const s = SYSTEM;
+  const today = new Date().toLocaleDateString('ko-KR',
+    { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+
+  document.getElementById('app').innerHTML = `
+    <header class="ps-topbar">
+      <div class="ps-brand">
+        <span class="ps-mark">${svg(s.brand.mark)}</span>
+        <span class="ps-brand-text">
+          <span class="ps-brand-title">${esc(s.brand.title)}</span>
+        </span>
+      </div>
+      <div class="ps-topbar-right">${today}</div>
+    </header>
+
+    <section class="ps-hero">
+      <form class="ps-search" onsubmit="return false;">
+        <span class="ps-search-icon">${svg('search')}</span>
+        <input id="ps-q" type="text" autocomplete="off"
+          placeholder="${esc(s.search.placeholder)}" aria-label="검색">
+      </form>
+      <div class="ps-hero-helper">${esc(s.search.helper)}</div>
+      <div class="ps-cats" id="ps-cats">${chipRow()}</div>
+    </section>
+
+    <main class="ps-section" style="padding-bottom:2.5rem;">
+      <div class="ps-section-label" id="ps-label">AI 모듈</div>
+      <div class="ps-kb" id="ps-kb"></div>
+      <div class="ps-grid" id="ps-grid"></div>
+      <div id="ps-empty"></div>
+    </main>
+
+    <footer class="ps-footer">
+      <span>${esc(s.maker)}</span>
+    </footer>`;
+
+  const input = document.getElementById('ps-q');
+  input.addEventListener('input', e => { state.q = e.target.value; update(); });
+  update();
+}
+
+render();
+</script>
 </body>
 </html>
