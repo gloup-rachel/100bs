@@ -32,6 +32,7 @@ const ICON = {
   lock:      '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
   search:    '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
   doc:       '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 3h9l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>',
+  package:   '<path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/>',
 };
 function svg(name, cls) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -75,6 +76,16 @@ const SYSTEM = {
       status: 'live',
       href: 'crm-os.html',
       steps: ['done', 'active', '', '', '', '', ''],
+    },
+    {
+      icon: 'package',
+      title: '품절·재입고 트래커',
+      cat: 'admin',
+      desc: '채널별 품절과 재입고 예정을 한곳에서 관리해요. 편성 일정과 겹치면 미리 알려줍니다.',
+      features: ['품절 현황', '재입고 예정', '편성 알림', '채널별 관리'],
+      status: 'live',
+      href: 'https://100bs-tracker.vercel.app/',
+      external: true,
     },
     {
       icon: 'trending',
