@@ -145,6 +145,74 @@ svg { display: block; }
 .ps-back:hover { background: var(--bg-subtle); color: var(--text); }
 .ps-back svg { width: 15px; height: 15px; }
 
+/* 사이드바 토글 버튼 (topbar 좌측) */
+.ps-nav-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; margin-right: .25rem;
+  border-radius: var(--r-sm); border: 1px solid transparent;
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+  transition: background .15s, color .15s; flex-shrink: 0;
+}
+.ps-nav-toggle:hover { background: var(--bg-subtle); color: var(--text); }
+.ps-nav-toggle svg { width: 20px; height: 20px; }
+
+/* ─────────────────────────────────────────────────────────────
+   SIDEBAR — 좌측 접이식 네비게이션 (config에서 렌더)
+   ───────────────────────────────────────────────────────────── */
+.ps-main-col { display: flex; flex-direction: column; min-height: 100vh; transition: margin-left .22s ease; }
+
+.ps-sidebar {
+  position: fixed; top: 0; left: 0; z-index: 40;
+  width: 264px; height: 100vh; overflow-y: auto;
+  background: var(--surface); border-right: 1px solid var(--border);
+  transform: translateX(-100%); transition: transform .22s ease;
+}
+body.ps-nav-open .ps-sidebar { transform: translateX(0); }
+
+.ps-sidebar-head {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .85rem 1.1rem; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.ps-sidebar-head .ps-mark { width: 28px; height: 28px; border-radius: 8px; }
+.ps-sidebar-head .ps-mark svg { width: 16px; height: 16px; }
+.ps-sidebar-title { font-size: .9rem; font-weight: 600; letter-spacing: -.02em; }
+
+.ps-nav { padding: .5rem .5rem 1.5rem; }
+.ps-nav-group {
+  font-size: .6875rem; font-weight: 600; letter-spacing: .06em;
+  color: var(--text-muted); padding: .9rem .6rem .35rem;
+}
+.ps-nav-item {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .5rem .6rem; border-radius: var(--r-sm);
+  font-size: .875rem; color: var(--text-secondary); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.ps-nav-item:hover { background: var(--bg-subtle); color: var(--text); }
+.ps-nav-item.active { background: var(--brand-soft); color: var(--brand); font-weight: 500; }
+.ps-nav-item svg { width: 17px; height: 17px; flex-shrink: 0; color: var(--text-muted); }
+.ps-nav-item.active svg { color: var(--brand); }
+.ps-nav-item .soon {
+  margin-left: auto; font-size: .625rem; color: var(--text-muted);
+  background: var(--bg-subtle); border: 1px solid var(--border);
+  border-radius: var(--r-pill); padding: .05rem .45rem;
+}
+
+/* 백드롭 (모바일 오버레이용) */
+.ps-nav-backdrop {
+  position: fixed; inset: 0; z-index: 35;
+  background: rgba(0,0,0,.35); opacity: 0; visibility: hidden;
+  transition: opacity .2s;
+}
+body.ps-nav-open .ps-nav-backdrop { opacity: 1; visibility: visible; }
+
+/* 데스크톱: 열리면 본문이 오른쪽으로 밀림 (백드롭 없음) */
+@media (min-width: 900px) {
+  .ps-nav-backdrop { display: none; }
+  body.ps-nav-open .ps-main-col { margin-left: 264px; }
+}
+
 /* ─────────────────────────────────────────────────────────────
    HERO — 검색 우선 (헤드라인 없이 바로 검색창)
    ───────────────────────────────────────────────────────────── */

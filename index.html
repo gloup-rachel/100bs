@@ -33,6 +33,8 @@ const ICON = {
   search:    '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
   doc:       '<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M5 3h9l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>',
   package:   '<path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3.3 7 12 12l8.7-5M12 22V12"/>',
+  list:      '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  home:      '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
 };
 function svg(name, cls) {
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -237,45 +239,100 @@ function update() {
     ? `<div class="ps-empty">${query ? '검색 결과가 없어요.' : '항목이 없어요.'}</div>` : '';
 }
 
+/* ── 사이드바 (config에서 렌더) ── */
+function sidebarHTML() {
+  const s = SYSTEM;
+  let h = `<div class="ps-sidebar-head">
+      <span class="ps-mark">${svg(s.brand.mark)}</span>
+      <span class="ps-sidebar-title">${esc(s.brand.title)}</span>
+    </div><nav class="ps-nav">
+    <div class="ps-nav-item" onclick="navHome()">${svg('home')}홈</div>`;
+  visibleCats().forEach(c => {
+    h += `<div class="ps-nav-group">${esc(c.label)}</div>`;
+    if (c.key === 'kb') {
+      (s.knowledge || []).forEach(k => {
+        const open = k.href ? `onclick="window.open('${k.href}','_blank','noopener')"` : '';
+        h += `<div class="ps-nav-item" ${open}>${svg('doc')}${esc(k.title)}</div>`;
+      });
+    } else {
+      s.modules.forEach((m, i) => {
+        if (m.cat !== c.key) return;
+        const live = m.status === 'live' && m.href;
+        const attr = live ? `onclick="openModuleNav(${i})"` : '';
+        const soon = m.status !== 'live' ? `<span class="soon">예정</span>` : '';
+        h += `<div class="ps-nav-item" ${attr}>${svg(m.icon)}${esc(m.title)}${soon}</div>`;
+      });
+    }
+  });
+  return h + `</nav>`;
+}
+function openModuleNav(i) {
+  const m = SYSTEM.modules[i];
+  if (!m || m.status !== 'live' || !m.href) return;
+  if (window.innerWidth < 900) closeNav();
+  if (m.external) window.open(m.href, '_blank', 'noopener'); else location.href = m.href;
+}
+function navHome() {
+  state.cat = 'all';
+  document.getElementById('ps-cats').innerHTML = chipRow();
+  update();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (window.innerWidth < 900) closeNav();
+}
+function setNav(open) {
+  document.body.classList.toggle('ps-nav-open', open);
+  try { localStorage.setItem('ps_nav', open ? '1' : '0'); } catch (e) {}
+}
+function toggleNav() { setNav(!document.body.classList.contains('ps-nav-open')); }
+function closeNav() { setNav(false); }
+
 function render() {
   const s = SYSTEM;
   const today = new Date().toLocaleDateString('ko-KR',
     { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
 
   document.getElementById('app').innerHTML = `
-    <header class="ps-topbar">
-      <div class="ps-brand">
-        <span class="ps-mark">${svg(s.brand.mark)}</span>
-        <span class="ps-brand-text">
-          <span class="ps-brand-title">${esc(s.brand.title)}</span>
-        </span>
-      </div>
-      <div class="ps-topbar-right">${today}</div>
-    </header>
+    <aside class="ps-sidebar">${sidebarHTML()}</aside>
+    <div class="ps-nav-backdrop" onclick="closeNav()"></div>
+    <div class="ps-main-col">
+      <header class="ps-topbar">
+        <div class="ps-brand">
+          <button class="ps-nav-toggle" onclick="toggleNav()" aria-label="메뉴 열기·닫기">${svg('list')}</button>
+          <span class="ps-mark">${svg(s.brand.mark)}</span>
+          <span class="ps-brand-text">
+            <span class="ps-brand-title">${esc(s.brand.title)}</span>
+          </span>
+        </div>
+        <div class="ps-topbar-right">${today}</div>
+      </header>
 
-    <section class="ps-hero">
-      <form class="ps-search" onsubmit="return false;">
-        <span class="ps-search-icon">${svg('search')}</span>
-        <input id="ps-q" type="text" autocomplete="off"
-          placeholder="${esc(s.search.placeholder)}" aria-label="검색">
-      </form>
-      <div class="ps-hero-helper">${esc(s.search.helper)}</div>
-      <div class="ps-cats" id="ps-cats">${chipRow()}</div>
-    </section>
+      <section class="ps-hero">
+        <form class="ps-search" onsubmit="return false;">
+          <span class="ps-search-icon">${svg('search')}</span>
+          <input id="ps-q" type="text" autocomplete="off"
+            placeholder="${esc(s.search.placeholder)}" aria-label="검색">
+        </form>
+        <div class="ps-hero-helper">${esc(s.search.helper)}</div>
+        <div class="ps-cats" id="ps-cats">${chipRow()}</div>
+      </section>
 
-    <main class="ps-section" style="padding-bottom:2.5rem;">
-      <div class="ps-section-label" id="ps-label">AI 모듈</div>
-      <div class="ps-kb" id="ps-kb"></div>
-      <div class="ps-grid" id="ps-grid"></div>
-      <div id="ps-empty"></div>
-    </main>
+      <main class="ps-section" style="padding-bottom:2.5rem;">
+        <div class="ps-section-label" id="ps-label">AI 모듈</div>
+        <div class="ps-kb" id="ps-kb"></div>
+        <div class="ps-grid" id="ps-grid"></div>
+        <div id="ps-empty"></div>
+      </main>
 
-    <footer class="ps-footer">
-      <span>${esc(s.maker)}</span>
-    </footer>`;
+      <footer class="ps-footer">
+        <span>${esc(s.maker)}</span>
+      </footer>
+    </div>`;
 
   const input = document.getElementById('ps-q');
   input.addEventListener('input', e => { state.q = e.target.value; update(); });
+  // 사이드바 기본 상태: 데스크톱 열림 / 모바일 닫힘 (사용자 선택은 기억)
+  let saved = null; try { saved = localStorage.getItem('ps_nav'); } catch (e) {}
+  setNav(saved === null ? window.innerWidth >= 900 : saved === '1');
   update();
 }
 
