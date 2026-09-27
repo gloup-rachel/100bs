@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>백년밥상 데일리 KPI · 2026년 10월</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/preset-system.css">
+<style>
+  .mm{max-width:var(--maxw);margin:0 auto;padding:1.2rem var(--gutter) 4rem}
+  .top{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin:.2rem 0 1.1rem}
+  .top .back{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text-secondary);text-decoration:none}
+  .top .back:hover{background:var(--bg-subtle)}
+  .top h1{font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin:0}
+  .top .mo{font-size:.95rem;font-weight:700;color:var(--text-secondary)}
+  .top .sp{flex:1}
+  .top .chip{font-size:.72rem;font-weight:600;color:var(--text-muted);background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--r-pill);padding:.28rem .6rem}
+  .pills{display:flex;gap:6px;margin-bottom:1.1rem}
+  .pill{font:inherit;font-size:.8rem;font-weight:700;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);border-radius:var(--r-pill);padding:.36rem .85rem;cursor:pointer;text-decoration:none}
+  .pill.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.6rem}
+  .tile{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);padding:.85rem .95rem}
+  .tile .l{font-size:.74rem;color:var(--text-muted)}
+  .tile .v{font-size:1.4rem;font-weight:800;font-variant-numeric:tabular-nums;margin-top:.15rem;letter-spacing:-.01em}
+  .tile .s{font-size:.74rem;color:var(--text-secondary);margin-top:.2rem}
+  .sec{margin-top:1.8rem}
+  .sech{display:flex;align-items:center;gap:.55rem;margin-bottom:.9rem}
+  .sech .n{font-size:.72rem;font-weight:800;color:var(--brand);background:var(--brand-soft);border-radius:var(--r-sm);padding:.15rem .45rem;font-variant-numeric:tabular-nums}
+  .sech h2{font-size:1.02rem;font-weight:800;margin:0}
+  .sech .hint{font-size:.74rem;color:var(--text-muted);font-weight:500}
+  /* 캘린더 */
+  .calwrap{overflow-x:auto}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;min-width:700px}
+  .cah{font-size:.74rem;font-weight:700;color:var(--text-muted);text-align:center;padding:.2rem 0}
+  .cah.sun{color:var(--danger)} .cah.sat{color:var(--series-1)}
+  .cell{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);padding:.5rem .55rem;min-height:112px;display:flex;flex-direction:column;gap:.2rem}
+  .cell.empty{border:0;background:transparent}
+  .cell.holi{background:var(--warn-soft);border-color:#f0e0c0}
+  .cell.peak{border:1.5px solid var(--brand)}
+  .cell .cd{display:flex;align-items:center;gap:.3rem;justify-content:space-between}
+  .cell .cd .dt{font-size:.85rem;font-weight:800;font-variant-numeric:tabular-nums}
+  .cell .idx{font-size:.6rem;font-weight:700;color:var(--text-secondary);background:var(--bg-subtle);border-radius:var(--r-pill);padding:0 .4rem}
+  .cell .idx.hi{background:var(--brand-soft);color:var(--brand)}
+  .cell .chp{font-size:.58rem;font-weight:700;border-radius:var(--r-pill);padding:1px 6px;align-self:flex-start}
+  .cell .chp.h{background:#f0e0c0;color:var(--warn)} .cell .chp.p{background:var(--brand-soft);color:var(--brand)}
+  .cell .row{font-size:.72rem;color:var(--text-secondary);display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+  .cell .row b{color:var(--text)}
+  .cell .prog{height:4px;border-radius:99px;background:var(--bg-sunken);margin-top:auto;overflow:hidden}
+  .cell .prog>i{display:block;height:100%;background:var(--live)}
+  .cell .pend{font-size:.64rem;color:var(--text-faint);margin-top:auto}
+  /* 배분 진단 */
+  .div{display:flex;flex-direction:column;gap:7px}
+  .divrow{display:grid;grid-template-columns:24px 1fr 64px;align-items:center;gap:.5rem}
+  .divrow .dw{font-size:.8rem;font-weight:700;color:var(--text-secondary);text-align:center}
+  .divtrack{position:relative;height:22px;background:var(--bg-subtle);border-radius:6px}
+  .divtrack .mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border-strong)}
+  .divtrack .fill{position:absolute;top:3px;bottom:3px;border-radius:4px}
+  .divrow .val{font-size:.78rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+  .over{color:var(--series-1)} .under{color:var(--series-2)}
+  .tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--r-md);margin-top:1rem}
+  table.mx{width:100%;border-collapse:collapse;font-size:.82rem;min-width:560px}
+  table.mx th{font-size:.7rem;color:var(--text-muted);font-weight:600;padding:.55rem .6rem;border-bottom:1px solid var(--border);white-space:nowrap;text-align:right;background:var(--bg-subtle)}
+  table.mx th.l,table.mx td.l{text-align:left}
+  table.mx td{padding:.5rem .6rem;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  table.mx td.mut{color:var(--text-faint)}
+  .card{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);padding:1.1rem 1.2rem}
+  .foot{font-size:.74rem;color:var(--text-muted);line-height:1.7;margin-top:1.6rem;padding-top:1rem;border-top:1px solid var(--border)}
+  .foot b{color:var(--text-secondary)}
+  .foot ol{margin:.3rem 0 0;padding-left:1.2rem}
+  @media(max-width:1039px){.tiles{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:767px){.tiles{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="mm">
+  <div class="top">
+    <a class="back" href="/media-mix/2026-10" title="미디어 믹스로"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></a>
+    <h1>백년밥상 데일리 KPI</h1>
+    <span class="mo" id="moLabel">2026년 10월</span>
+    <span class="sp"></span>
+    <span class="chip" id="genChip">갱신 -</span>
+    <span class="chip">VAT 별도</span>
+    <span class="chip">라플라스 6651</span>
+  </div>
+
+  <div class="pills">
+    <a class="pill" href="/media-mix/2026-10">미디어 믹스</a>
+    <span class="pill on">데일리 KPI</span>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="sec">
+    <div class="sech"><span class="n">01</span><h2>데일리 캘린더</h2><span class="hint">예산 · 목표 · 실적 (만원)</span></div>
+    <div class="calwrap"><div class="cal" id="cal"></div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><span class="n">02</span><h2>배분 진단</h2><span class="hint">자사몰 메타 현재 편성 − 요일지수 비례 재배분</span></div>
+    <div class="card">
+      <div class="div" id="div"></div>
+      <div class="tblwrap"><table class="mx" id="divtbl"></table></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><span class="n">03</span><h2>10월 계획 대비 9월 실집행</h2><span class="hint">채널별 일평균</span></div>
+    <div class="tblwrap"><table class="mx" id="acttbl"></table></div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const sum=a=>a.reduce((x,y)=>x+y,0);
+const DOWH=["일","월","화","수","목","금","토"];
+const todayISO=new Date().toISOString().slice(0,10);
+
+fetch('/media-mix/2026-10/data.json').then(r=>r.json()).then(D=>{
+  const {dow,mix,goal,total,realloc,weekday_index,days,plan_avg,act_avg,group,gorder,generated_at}=D;
+  const gt=new Date(generated_at),p=x=>String(x).padStart(2,'0');
+  $('genChip').textContent=`갱신 ${p(gt.getMonth()+1)}-${p(gt.getDate())} ${p(gt.getHours())}:${p(gt.getMinutes())}`;
+
+  // 스탯 타일 3
+  const holis=days.filter(d=>d.holiday);
+  const peaks=days.filter(d=>d.idx_own>=1.7);
+  const idxThu=weekday_index.CAFE_24["목"], idxSun=weekday_index.CAFE_24["일"];
+  const range=arr=>{const ds=arr.map(x=>x.date.slice(5)); return ds[0]+(ds.length>1?'~'+ds[ds.length-1]:'');};
+  const holiRanges=()=>{ // 연속 구간 묶기
+    const ds=holis.map(h=>h.date).sort(); const out=[]; let s=null,pv=null;
+    ds.forEach(d=>{const dd=new Date(d); if(pv&&(dd-pv)===864e5){pv=dd;}else{if(s)out.push([s,pv]);s=dd;pv=dd;}});
+    if(s)out.push([s,pv]);
+    return out.map(([a,b])=>{const f=x=>String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); return a.getTime()===b.getTime()?f(a):f(a)+'~'+f(b);}).join(', ');
+  };
+  $('tiles').innerHTML=[
+    ['연휴 일수',`${holis.length}일`,holiRanges()],
+    ['최대 요일',`${peaks.length}일`,peaks.map(d=>d.date.slice(5)).join(', ')],
+    ['자사몰 목요일 지수',idxThu.toFixed(2),`일요일 ${idxSun.toFixed(2)}의 ${(idxThu/idxSun).toFixed(1)}배`],
+  ].map(([l,v,s])=>`<div class="tile"><div class="l">${l}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('');
+
+  // 01 캘린더
+  const first=new Date(days[0].date); const lead=first.getDay();
+  let cells=DOWH.map((d,i)=>`<div class="cah ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');
+  for(let i=0;i<lead;i++) cells+=`<div class="cell empty"></div>`;
+  days.forEach(x=>{
+    const peak=x.idx_own>=1.7, isToday=x.date===todayISO;
+    const chips=(x.holiday?`<span class="chp h">${x.holiday}</span>`:'')+(peak?`<span class="chp p">최대 요일</span>`:'');
+    let perf='';
+    if(isToday) perf=`<div class="pend">집계 진행 중</div>`;
+    else if(x.act_sales){ const a=(x.act_sales.자사몰||0)+(x.act_sales.스마트스토어||0); perf=`<div class="row">실적 <b>${a.toLocaleString()}</b></div><div class="prog"><i style="width:${Math.min(100,a/x.goal*100).toFixed(0)}%"></i></div>`; }
+    cells+=`<div class="cell ${x.holiday?'holi':''} ${peak?'peak':''}">
+      <div class="cd"><span class="dt">${+x.date.slice(-2)}</span><span class="idx ${peak?'hi':''}">지수 ${x.idx_own.toFixed(2)}</span></div>
+      ${chips}
+      <div class="row">예산 <b>${x.plan}</b></div>
+      <div class="row">목표 <b>${x.goal.toLocaleString()}</b></div>
+      ${perf}
+    </div>`;
+  });
+  $('cal').innerHTML=cells;
+
+  // 02 배분 진단
+  const own=mix["자사몰 메타"];
+  const diffs=dow.map((d,i)=>({dw:d,plan:own[i],re:realloc[d],diff:own[i]-realloc[d],idx:weekday_index.CAFE_24[d]}));
+  const maxAbs=Math.max(...diffs.map(x=>Math.abs(x.diff)));
+  $('div').innerHTML=diffs.map(x=>{
+    const w=(Math.abs(x.diff)/maxAbs*50).toFixed(1);
+    const fill=x.diff>=0
+      ? `<div class="fill" style="left:50%;width:${w}%;background:var(--series-1)"></div>`
+      : `<div class="fill" style="right:50%;width:${w}%;background:var(--series-2)"></div>`;
+    return `<div class="divrow"><span class="dw">${x.dw}</span><div class="divtrack"><div class="mid"></div>${fill}</div><span class="val ${x.diff>=0?'over':'under'}">${x.diff>=0?'+':''}${x.diff.toFixed(1)}만</span></div>`;
+  }).join('');
+  $('divtbl').innerHTML=`<thead><tr><th class="l">요일</th><th>현재 편성</th><th>지수 비례</th><th>차이</th><th>자사몰 지수</th></tr></thead><tbody>`
+    +diffs.map(x=>`<tr><td class="l">${x.dw}</td><td>${x.plan.toFixed(1)}만</td><td>${x.re.toFixed(1)}만</td><td class="${x.diff>=0?'over':'under'}">${x.diff>=0?'+':''}${x.diff.toFixed(1)}만</td><td>${x.idx.toFixed(2)}</td></tr>`).join('')
+    +`<tr class="" style="border-top:2px solid var(--border-strong);font-weight:800"><td class="l">합계</td><td>${sum(own).toFixed(0)}만</td><td>${sum(diffs.map(x=>x.re)).toFixed(0)}만</td><td class="mut">-</td><td class="mut">-</td></tr></tbody>`;
+
+  // 03 계획 대비 실집행
+  const chans=Object.keys(mix);
+  $('acttbl').innerHTML=`<thead><tr><th class="l">채널</th><th>10월 계획 일평균</th><th>9월 실집행 일평균</th><th>차이율</th></tr></thead><tbody>`
+    +chans.map(c=>{
+      const pa=plan_avg[c], aa=act_avg[c];
+      const has=(aa!==undefined&&aa!==null);
+      const diffPct=has?((pa-aa)/aa*100):null;
+      return `<tr><td class="l">${c}</td><td>${pa.toFixed(1)}만</td><td>${has?aa.toFixed(1)+'만':'<span class="mut">집계 대기</span>'}</td><td class="${has?(diffPct<0?'under':'over'):'mut'}">${has?(diffPct>=0?'+':'')+diffPct.toFixed(0)+'%':'-'}</td></tr>`;
+    }).join('')+`</tbody>`;
+
+  const sc=Object.values(weekday_index.CAFE_24).reduce((a,b)=>a+b,0);
+  $('foot').innerHTML=`<b>REMARK</b><ol>
+    <li>단위 만원(VAT 별도). 매출 목표·실적은 구매완료 기준.</li>
+    <li>요일 지수: 청정 2주(2026-09-07~09-19) 자사몰·스마트스토어 주문건수 요일평균 ÷ 일평균. 09-20 이후 연휴 러시로 제외. 연휴 종료 후 새 청정 구간으로 재산출 필요. ΣCAFE_24=${sc.toFixed(3)}.</li>
+    <li>배분 진단: 자사몰 메타는 전 요일 55만 균등 편성으로, 목요일(과소 ${diffs.find(x=>x.dw==='목').diff.toFixed(0)}만)·일요일(과다 +${diffs.find(x=>x.dw==='일').diff.toFixed(0)}만) 등 요일지수와 반대로 배분돼 있음.</li>
+    <li>9월 실집행: 자사몰 메타만 라플라스 집계 반영(74.4만). 나머지 채널은 집계 연동 대기.</li>
+    <li>데이터 출처: 라플라스(project 6651) commerce_order·commerce_ad + 백년밥상_RAW 시트.</li>
+  </ol>`;
+}).catch(e=>{ $('tiles').innerHTML=`<div class="tile" style="grid-column:1/-1;color:var(--danger)">데이터를 불러오지 못했습니다. (${e.message})</div>`; });
+</script>
+</body>
+</html>

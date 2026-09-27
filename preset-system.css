@@ -66,6 +66,19 @@
   /* 레이아웃 */
   --maxw: 1040px;
   --gutter: clamp(1.25rem, 4vw, 2.5rem);
+
+  /* 차트 계열색 (미디어 믹스·KPI) — 색각(CVD) 검증 통과 세트. --brand는 계열색으로 쓰지 않음 */
+  --series-1: #2a78d6;   /* 자사몰 메타 */
+  --series-2: #eb6834;   /* 스마트스토어 메타 */
+  --series-3: #1baf7a;   /* 스마트스토어 검색(쇼핑검색+파워링크) */
+  --series-4: #eda100;   /* 스마트스토어 기타(GFA+브랜드검색) */
+  --series-5: #e87ba4;   /* 고정비(라플라스+인건비) */
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70;
+    --series-4: #c98500; --series-5: #d55181;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
