@@ -88,7 +88,12 @@
   </div>
 
   <div class="sec">
-    <div class="sech"><span class="n">02</span><h2>채널 × 요일 편성표</h2></div>
+    <div class="sech"><span class="n">02</span><h2>자사몰 메타 캠페인별 주간 예산</h2><span style="font-size:.74rem;color:var(--text-muted);font-weight:500">총 470만 · C_01은 월~목 4일 추가 편성</span></div>
+    <div class="tblwrap"><table class="mx" id="camp"></table></div>
+  </div>
+
+  <div class="sec">
+    <div class="sech"><span class="n">03</span><h2>채널 × 요일 편성표</h2></div>
     <div class="tblwrap"><table class="mx" id="grid"></table></div>
   </div>
 
@@ -143,6 +148,14 @@ fetch('/media-mix/2026-10/data.json').then(r=>r.json()).then(D=>{
   const goalRow=`<tr><td class="l">매출 목표</td>${goal.map(v=>`<td>${manNum(v)}</td>`).join('')}<td>${manNum(wkGoal)}</td><td class="mut">-</td></tr>`;
   const roasRow=`<tr class="tot"><td class="l">목표 ROAS</td>${dow.map((_,i)=>`<td>${(goal[i]/total[i]*100).toFixed(0)}%</td>`).join('')}<td>${(wkGoal/wkTotal*100).toFixed(0)}%</td><td class="mut">-</td></tr>`;
   $('grid').innerHTML=th+`<tbody>${rows}${totRow}${goalRow}${roasRow}</tbody>`;
+
+  // 02 자사몰 메타 캠페인별 주간 예산
+  const cw=D.campaign_week||{}; const wkOwn=sum(D.own_daily||[0]); const scw=sum(Object.values(cw));
+  const campRows=Object.entries(cw).map(([name,wk])=>{
+    const isC=name.includes('C_01'), nd=isC?4:7, daily=wk/nd;
+    return `<tr><td class="l">${name}</td><td>${daily}만</td><td>${isC?'4일 (월~목)':'7일'}</td><td>${wk}만</td><td>${(wk/wkOwn*100).toFixed(1)}%</td></tr>`;
+  }).join('');
+  $('camp').innerHTML=`<thead><tr><th class="l">캠페인</th><th>일 예산</th><th>운영일</th><th>주간 예산</th><th>비중</th></tr></thead><tbody>${campRows}<tr class="tot"><td class="l">합계</td><td class="mut">-</td><td class="mut">-</td><td>${scw}만</td><td>100%</td></tr></tbody>`;
 
   const sc=Object.values(D.weekday_index.CAFE_24).reduce((a,b)=>a+b,0);
   $('foot').innerHTML=`<b>주석</b> · 단위 만원(VAT 별도) · 매출 목표/실적은 구매완료 기준 · 요일 지수는 청정 2주(2026-09-07~09-19) 주문건수 기준, 연휴 종료 후 재산출 필요 · ΣCAFE_24=${sc.toFixed(3)} (재배분값은 이 합으로 정규화) · 데이터 출처 라플라스(6651) + 백년밥상_RAW 시트`;

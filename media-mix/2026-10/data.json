@@ -10,14 +10,23 @@
     "토"
   ],
   "mix": {
-    "자사몰 메타": [
-      55,
-      55,
-      55,
-      55,
-      55,
-      55,
-      55
+    "자사몰 메타 (상시)": [
+      50,
+      50,
+      50,
+      50,
+      50,
+      50,
+      50
+    ],
+    "자사몰 메타 (C_01 프로모션)": [
+      0,
+      30,
+      30,
+      30,
+      30,
+      0,
+      0
     ],
     "스마트스토어 메타": [
       65,
@@ -93,16 +102,40 @@
     1000
   ],
   "total": [
-    157,
-    237,
-    248,
-    264,
-    264,
-    236,
-    157
+    152,
+    262,
+    273,
+    289,
+    289,
+    231,
+    152
   ],
+  "own_daily": [
+    50,
+    80,
+    80,
+    80,
+    80,
+    50,
+    50
+  ],
+  "promo_days": [
+    "월",
+    "화",
+    "수",
+    "목"
+  ],
+  "campaign_week": {
+    "A_01 메인베스트": 105,
+    "A_02 가성비": 70,
+    "B_01 큐레이션": 70,
+    "C_01 시즌/프로모션": 120,
+    "D_01 트래픽 리타겟": 52.5,
+    "E_01 단품 트래픽": 52.5
+  },
   "group": {
-    "자사몰 메타": "자사몰 메타",
+    "자사몰 메타 (상시)": "자사몰 메타",
+    "자사몰 메타 (C_01 프로모션)": "자사몰 메타",
     "스마트스토어 메타": "스마트스토어 메타",
     "스마트스토어 쇼핑검색": "스마트스토어 검색",
     "스마트스토어 파워링크": "스마트스토어 검색",
@@ -120,325 +153,362 @@
   ],
   "weekday_index": {
     "CAFE_24": {
-      "일": 0.355,
-      "월": 0.619,
-      "화": 0.825,
-      "수": 1.403,
-      "목": 1.787,
-      "금": 0.991,
-      "토": 0.699
+      "일": 0.321,
+      "월": 0.653,
+      "화": 0.871,
+      "수": 1.482,
+      "목": 1.888,
+      "금": 1.047,
+      "토": 0.738
     },
     "SMARTSTORE": {
-      "일": 0.469,
-      "월": 0.748,
-      "화": 1.003,
-      "수": 1.475,
-      "목": 1.538,
-      "금": 0.964,
-      "토": 0.538
+      "일": 0.445,
+      "월": 0.783,
+      "화": 1.049,
+      "수": 1.543,
+      "목": 1.609,
+      "금": 1.008,
+      "토": 0.563
     }
   },
   "days": [
     {
       "date": "2026-10-01",
       "dow": "목",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.787,
+      "idx_own": 1.888,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-02",
       "dow": "금",
-      "plan": 236,
+      "plan": 231,
       "goal": 1500,
-      "idx_own": 0.991,
+      "idx_own": 1.047,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-03",
       "dow": "토",
-      "plan": 157,
+      "plan": 152,
       "goal": 1000,
-      "idx_own": 0.699,
+      "idx_own": 0.738,
       "holiday": "개천절",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-04",
       "dow": "일",
-      "plan": 157,
+      "plan": 152,
       "goal": 1200,
-      "idx_own": 0.355,
+      "idx_own": 0.321,
       "holiday": "연휴",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-05",
       "dow": "월",
-      "plan": 237,
+      "plan": 262,
       "goal": 1500,
-      "idx_own": 0.619,
+      "idx_own": 0.653,
       "holiday": "대체공휴일",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-06",
       "dow": "화",
-      "plan": 248,
+      "plan": 273,
       "goal": 1800,
-      "idx_own": 0.825,
+      "idx_own": 0.871,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-07",
       "dow": "수",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.403,
+      "idx_own": 1.482,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-08",
       "dow": "목",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.787,
+      "idx_own": 1.888,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-09",
       "dow": "금",
-      "plan": 236,
+      "plan": 231,
       "goal": 1500,
-      "idx_own": 0.991,
+      "idx_own": 1.047,
       "holiday": "한글날",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-10",
       "dow": "토",
-      "plan": 157,
+      "plan": 152,
       "goal": 1000,
-      "idx_own": 0.699,
+      "idx_own": 0.738,
       "holiday": "연휴",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-11",
       "dow": "일",
-      "plan": 157,
+      "plan": 152,
       "goal": 1200,
-      "idx_own": 0.355,
+      "idx_own": 0.321,
       "holiday": "연휴",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-12",
       "dow": "월",
-      "plan": 237,
+      "plan": 262,
       "goal": 1500,
-      "idx_own": 0.619,
+      "idx_own": 0.653,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-13",
       "dow": "화",
-      "plan": 248,
+      "plan": 273,
       "goal": 1800,
-      "idx_own": 0.825,
+      "idx_own": 0.871,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-14",
       "dow": "수",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.403,
+      "idx_own": 1.482,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-15",
       "dow": "목",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.787,
+      "idx_own": 1.888,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-16",
       "dow": "금",
-      "plan": 236,
+      "plan": 231,
       "goal": 1500,
-      "idx_own": 0.991,
+      "idx_own": 1.047,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-17",
       "dow": "토",
-      "plan": 157,
+      "plan": 152,
       "goal": 1000,
-      "idx_own": 0.699,
+      "idx_own": 0.738,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-18",
       "dow": "일",
-      "plan": 157,
+      "plan": 152,
       "goal": 1200,
-      "idx_own": 0.355,
+      "idx_own": 0.321,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-19",
       "dow": "월",
-      "plan": 237,
+      "plan": 262,
       "goal": 1500,
-      "idx_own": 0.619,
+      "idx_own": 0.653,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-20",
       "dow": "화",
-      "plan": 248,
+      "plan": 273,
       "goal": 1800,
-      "idx_own": 0.825,
+      "idx_own": 0.871,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-21",
       "dow": "수",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.403,
+      "idx_own": 1.482,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-22",
       "dow": "목",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.787,
+      "idx_own": 1.888,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-23",
       "dow": "금",
-      "plan": 236,
+      "plan": 231,
       "goal": 1500,
-      "idx_own": 0.991,
+      "idx_own": 1.047,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-24",
       "dow": "토",
-      "plan": 157,
+      "plan": 152,
       "goal": 1000,
-      "idx_own": 0.699,
+      "idx_own": 0.738,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-25",
       "dow": "일",
-      "plan": 157,
+      "plan": 152,
       "goal": 1200,
-      "idx_own": 0.355,
+      "idx_own": 0.321,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-26",
       "dow": "월",
-      "plan": 237,
+      "plan": 262,
       "goal": 1500,
-      "idx_own": 0.619,
+      "idx_own": 0.653,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-27",
       "dow": "화",
-      "plan": 248,
+      "plan": 273,
       "goal": 1800,
-      "idx_own": 0.825,
+      "idx_own": 0.871,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-28",
       "dow": "수",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.403,
+      "idx_own": 1.482,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-29",
       "dow": "목",
-      "plan": 264,
+      "plan": 289,
       "goal": 3000,
-      "idx_own": 1.787,
+      "idx_own": 1.888,
       "holiday": "",
+      "promo": true,
       "act_sales": null
     },
     {
       "date": "2026-10-30",
       "dow": "금",
-      "plan": 236,
+      "plan": 231,
       "goal": 1500,
-      "idx_own": 0.991,
+      "idx_own": 1.047,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     },
     {
       "date": "2026-10-31",
       "dow": "토",
-      "plan": 157,
+      "plan": 152,
       "goal": 1000,
-      "idx_own": 0.699,
+      "idx_own": 0.738,
       "holiday": "",
+      "promo": false,
       "act_sales": null
     }
   ],
   "plan_avg": {
-    "자사몰 메타": 55,
+    "자사몰 메타": 67.1,
     "스마트스토어 메타": 95.6,
     "스마트스토어 쇼핑검색": 21.4,
     "스마트스토어 파워링크": 5,
     "스마트스토어 GFA 애드부스트": 14.3,
-    "스마트스토어 브랜드 검색": 10,
-    "라플라스": 4,
-    "인건비": 18
+    "스마트스토어 브랜드 검색": 10
   },
   "act_avg": {
-    "자사몰 메타": 74.4
+    "자사몰 메타": 74.4,
+    "스마트스토어 메타": 95.1,
+    "스마트스토어 쇼핑검색": 19.3,
+    "스마트스토어 파워링크": 3.6,
+    "스마트스토어 GFA 애드부스트": 14.5,
+    "스마트스토어 브랜드 검색": 10
+  },
+  "act_note": {
+    "스마트스토어 브랜드 검색": "선계약 고정 (일 10만, 라플라스 미반영)"
   },
   "realloc": {
-    "일": 20.5,
-    "월": 35.7,
-    "화": 47.6,
-    "수": 80.9,
-    "목": 103,
-    "금": 57.1,
-    "토": 40.3
+    "일": 21.6,
+    "월": 43.8,
+    "화": 58.5,
+    "수": 99.5,
+    "목": 126.8,
+    "금": 70.3,
+    "토": 49.6
   }
 }

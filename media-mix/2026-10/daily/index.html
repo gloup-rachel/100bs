@@ -43,7 +43,7 @@
   .cell .idx{font-size:.6rem;font-weight:700;color:var(--text-secondary);background:var(--bg-subtle);border-radius:var(--r-pill);padding:0 .4rem}
   .cell .idx.hi{background:var(--brand-soft);color:var(--brand)}
   .cell .chp{font-size:.58rem;font-weight:700;border-radius:var(--r-pill);padding:1px 6px;align-self:flex-start}
-  .cell .chp.h{background:#f0e0c0;color:var(--warn)} .cell .chp.p{background:var(--brand-soft);color:var(--brand)}
+  .cell .chp.h{background:#f0e0c0;color:var(--warn)} .cell .chp.p{background:var(--brand-soft);color:var(--brand)} .cell .chp.c{background:#e3f5ee;color:#199e70}
   .cell .row{font-size:.72rem;color:var(--text-secondary);display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
   .cell .row b{color:var(--text)}
   .cell .prog{height:4px;border-radius:99px;background:var(--bg-sunken);margin-top:auto;overflow:hidden}
@@ -105,7 +105,7 @@
   </div>
 
   <div class="sec">
-    <div class="sech"><span class="n">03</span><h2>10월 계획 대비 9월 실집행</h2><span class="hint">채널별 일평균</span></div>
+    <div class="sech"><span class="n">03</span><h2>10월 계획 대비 9월 실집행</h2><span class="hint">매체비 일평균 · 고정비 제외</span></div>
     <div class="tblwrap"><table class="mx" id="acttbl"></table></div>
   </div>
 
@@ -146,7 +146,7 @@ fetch('/media-mix/2026-10/data.json').then(r=>r.json()).then(D=>{
   for(let i=0;i<lead;i++) cells+=`<div class="cell empty"></div>`;
   days.forEach(x=>{
     const peak=x.idx_own>=1.7, isToday=x.date===todayISO;
-    const chips=(x.holiday?`<span class="chp h">${x.holiday}</span>`:'')+(peak?`<span class="chp p">최대 요일</span>`:'');
+    const chips=(x.holiday?`<span class="chp h">${x.holiday}</span>`:'')+(peak?`<span class="chp p">최대 요일</span>`:'')+((x.promo&&!x.holiday)?`<span class="chp c">C_01 운영</span>`:'');
     let perf='';
     if(isToday) perf=`<div class="pend">집계 진행 중</div>`;
     else if(x.act_sales){ const a=(x.act_sales.자사몰||0)+(x.act_sales.스마트스토어||0); perf=`<div class="row">실적 <b>${a.toLocaleString()}</b></div><div class="prog"><i style="width:${Math.min(100,a/x.goal*100).toFixed(0)}%"></i></div>`; }
@@ -161,7 +161,7 @@ fetch('/media-mix/2026-10/data.json').then(r=>r.json()).then(D=>{
   $('cal').innerHTML=cells;
 
   // 02 배분 진단
-  const own=mix["자사몰 메타"];
+  const own=D.own_daily;
   const diffs=dow.map((d,i)=>({dw:d,plan:own[i],re:realloc[d],diff:own[i]-realloc[d],idx:weekday_index.CAFE_24[d]}));
   const maxAbs=Math.max(...diffs.map(x=>Math.abs(x.diff)));
   $('div').innerHTML=diffs.map(x=>{
@@ -175,22 +175,26 @@ fetch('/media-mix/2026-10/data.json').then(r=>r.json()).then(D=>{
     +diffs.map(x=>`<tr><td class="l">${x.dw}</td><td>${x.plan.toFixed(1)}만</td><td>${x.re.toFixed(1)}만</td><td class="${x.diff>=0?'over':'under'}">${x.diff>=0?'+':''}${x.diff.toFixed(1)}만</td><td>${x.idx.toFixed(2)}</td></tr>`).join('')
     +`<tr class="" style="border-top:2px solid var(--border-strong);font-weight:800"><td class="l">합계</td><td>${sum(own).toFixed(0)}만</td><td>${sum(diffs.map(x=>x.re)).toFixed(0)}만</td><td class="mut">-</td><td class="mut">-</td></tr></tbody>`;
 
-  // 03 계획 대비 실집행
-  const chans=Object.keys(mix);
-  $('acttbl').innerHTML=`<thead><tr><th class="l">채널</th><th>10월 계획 일평균</th><th>9월 실집행 일평균</th><th>차이율</th></tr></thead><tbody>`
-    +chans.map(c=>{
-      const pa=plan_avg[c], aa=act_avg[c];
-      const has=(aa!==undefined&&aa!==null);
-      const diffPct=has?((pa-aa)/aa*100):null;
-      return `<tr><td class="l">${c}</td><td>${pa.toFixed(1)}만</td><td>${has?aa.toFixed(1)+'만':'<span class="mut">집계 대기</span>'}</td><td class="${has?(diffPct<0?'under':'over'):'mut'}">${has?(diffPct>=0?'+':'')+diffPct.toFixed(0)+'%':'-'}</td></tr>`;
-    }).join('')+`</tbody>`;
+  // 03 계획 대비 실집행 (매체비 6채널, 고정비 제외)
+  const mchans=Object.keys(plan_avg); const note=D.act_note||{};
+  let sp=0,sa=0;
+  const arows=mchans.map(c=>{
+    const pa=plan_avg[c], aa=act_avg[c]; sp+=pa; sa+=aa;
+    const diff=(aa-pa)/pa*100;
+    const nt=note[c]?` <span style="font-size:.66rem;color:var(--warn)">· ${note[c]}</span>`:'';
+    return `<tr><td class="l">${c}${nt}</td><td>${pa.toFixed(1)}만</td><td>${aa.toFixed(1)}만</td><td>${diff>=0?'+':''}${diff.toFixed(1)}%</td></tr>`;
+  }).join('');
+  const sd=(sa-sp)/sp*100;
+  $('acttbl').innerHTML=`<thead><tr><th class="l">채널</th><th>10월 계획 일평균</th><th>9월 실집행 일평균</th><th>차이</th></tr></thead><tbody>${arows}<tr style="border-top:2px solid var(--border-strong);font-weight:800"><td class="l">매체비 합계</td><td>${sp.toFixed(1)}만</td><td>${sa.toFixed(1)}만</td><td>${sd>=0?'+':''}${sd.toFixed(1)}%</td></tr></tbody>`;
 
   const sc=Object.values(weekday_index.CAFE_24).reduce((a,b)=>a+b,0);
+  const dMon=diffs.find(x=>x.dw==='월').diff, dThu=diffs.find(x=>x.dw==='목').diff;
   $('foot').innerHTML=`<b>REMARK</b><ol>
     <li>단위 만원(VAT 별도). 매출 목표·실적은 구매완료 기준.</li>
-    <li>요일 지수: 청정 2주(2026-09-07~09-19) 자사몰·스마트스토어 주문건수 요일평균 ÷ 일평균. 09-20 이후 연휴 러시로 제외. 연휴 종료 후 새 청정 구간으로 재산출 필요. ΣCAFE_24=${sc.toFixed(3)}.</li>
-    <li>배분 진단: 자사몰 메타는 전 요일 55만 균등 편성으로, 목요일(과소 ${diffs.find(x=>x.dw==='목').diff.toFixed(0)}만)·일요일(과다 +${diffs.find(x=>x.dw==='일').diff.toFixed(0)}만) 등 요일지수와 반대로 배분돼 있음.</li>
-    <li>9월 실집행: 자사몰 메타만 라플라스 집계 반영(74.4만). 나머지 채널은 집계 연동 대기.</li>
+    <li>요일 지수: 청정 2주(2026-09-06~09-19, 14일) 자사몰·스마트스토어 주문건수 요일평균 ÷ 7요일 평균의 평균. 산출 창은 7의 배수로 잡고 기준값은 7요일 평균의 평균 → ΣCAFE_24=${sc.toFixed(3)}. 연휴 종료 후 새 청정 2주로 재산출 필요.</li>
+    <li>배분 진단: C_01 프로모션이 월~목 4일만 운영되며 그 4일에 30만이 얹혀 월~목 80만·금토일 50만 구조. 자사몰 목요일 지수 ${idxThu.toFixed(2)}·월요일 ${weekday_index.CAFE_24['월'].toFixed(2)}로 2.9배 차이인데 예산은 균등 → 월요일 +${dMon.toFixed(1)}만 과다, 목요일 ${dThu.toFixed(1)}만 과소. C_01을 수~토로 옮기면 지수와 더 맞고 연휴 직전 10/2(금)도 커버됨.</li>
+    <li>9월 실집행: 매체비 6채널 라플라스 집계(2026-09-01~09-22). 브랜드 검색은 선계약 고정(일 10만, 라플라스 미반영). 고정비(라플라스·인건비)는 실집행 개념이 없어 제외.</li>
+    <li>자사몰 메타 10월 계획 일평균 67.1만 vs 9월 실집행 74.4만 → 계획이 9.8% 적음.</li>
     <li>데이터 출처: 라플라스(project 6651) commerce_order·commerce_ad + 백년밥상_RAW 시트.</li>
   </ol>`;
 }).catch(e=>{ $('tiles').innerHTML=`<div class="tile" style="grid-column:1/-1;color:var(--danger)">데이터를 불러오지 못했습니다. (${e.message})</div>`; });
