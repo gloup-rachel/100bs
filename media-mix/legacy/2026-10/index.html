@@ -74,7 +74,7 @@
     <span class="pill off" title="데이터 없음">8월</span>
     <span class="pill off" title="데이터 없음">9월</span>
     <span class="pill on">10월</span>
-    <a class="pill" href="/media-mix/2026-10/daily" style="margin-left:auto">데일리 KPI →</a>
+    <a class="pill" href="/media-mix/legacy/2026-10/daily" style="margin-left:auto">데일리 KPI →</a>
   </div>
 
   <div class="tiles" id="tiles"></div>
@@ -106,7 +106,7 @@ const won=n=>{n=Math.round(n); return n>=10000?(n/10000).toFixed(2)+'억':n.toLo
 const manNum=n=>Math.round(n).toLocaleString();
 const sum=a=>a.reduce((x,y)=>x+y,0);
 
-fetch('/media-mix/2026-10/data.json').then(r=>r.json()).then(D=>{
+fetch('/media-mix/legacy/2026-10/data.json').then(r=>r.json()).then(D=>{
   const {dow,mix,goal,total,group,gorder,generated_at}=D;
   const channels=Object.keys(mix);
   const wkTotal=sum(total);                       // 주간 총 광고비

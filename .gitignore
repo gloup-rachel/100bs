@@ -6,3 +6,14 @@ node_modules/
 *.xlsx
 *.docx
 *.skill
+
+# 트래커 리스킨 작업 파일 (별도 Vercel 프로젝트 — 이 레포에 배포 금지)
+tracker-work/
+100bs-tracker-*.zip
+100bs-tracker/
+*트래커 Vercel 배포.md
+.vercel
+.env.local
+
+# 내부 핸드오프 문서 (배포·공개 저장소에 올리지 않음)
+docs/mediamix_v8.1_handoff/
