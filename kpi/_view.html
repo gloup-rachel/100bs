@@ -122,21 +122,32 @@ td .note{display:block;font-size:10.5px;color:var(--ink3);font-weight:400;white-
 .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .kv div{background:var(--head);border-radius:8px;padding:8px 10px}
 .kv .k{font-size:11px;color:var(--ink2)}.kv .v{font-weight:700;font-size:15px}
-.cal2{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;padding:16px}
+.cal2{padding:16px;display:flex;flex-direction:column;gap:6px}
+.calhead,.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(64px,.92fr);gap:6px}
 .cal2 .hd{font-size:11px;color:var(--ink3);text-align:center}
-.dc{border:1px solid var(--line2);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:4px;min-height:96px}
+.dc{border:1px solid var(--line2);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;min-height:104px}
+.dc.empty{border:0;background:transparent;min-height:0}
 .dc.h{background:var(--warn-bg);border-color:transparent}
 .dc.p{outline:2px solid var(--accent);outline-offset:-2px}
 .dc .d{font-size:11px;color:var(--ink3);display:flex;justify-content:space-between;gap:4px}
-.band{border-radius:6px;padding:3px 5px;font-size:10.5px;line-height:1.35}
+.daytot{font-size:11px;font-weight:700;border-bottom:1px solid var(--line2);padding-bottom:3px;font-variant-numeric:tabular-nums}
+.daytot b{font-size:12.5px}
+.band{border-radius:6px;padding:3px 5px;font-size:10.5px;line-height:1.3}
 .band.n{background:var(--nav-soft);color:var(--nav)}
 .band.o{background:var(--own-soft);color:var(--own)}
-.band b{font-size:11.5px}
+.band .bt b{font-size:11px}
+.band .bl{font-variant-numeric:tabular-nums}
+.band .bl.ad{color:var(--ink3)}
+.band .r{font-weight:700;margin-left:1px}
 .band .x{color:var(--ink3)}
+.wsum{border:1px solid var(--line2);border-radius:8px;background:var(--head);padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}
+.wsum .wt{font-size:10px;color:var(--ink3)}
+.wsum .wp{font-size:17px;font-weight:700;color:var(--accent);line-height:1.1}
+.wsum .wsub{font-size:10px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .legend2{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 16px 0;font-size:12px;color:var(--ink2)}
 .seg button{min-width:56px}
 .ach{font-weight:700}
-@media (max-width:760px){.cal2{gap:3px;padding:8px}.dc{min-height:88px;padding:3px}.band{font-size:9.5px;padding:2px 3px}.kv{grid-template-columns:1fr 1fr}}
+@media (max-width:760px){.cal2{gap:3px;padding:8px}.calhead,.week{gap:3px}.dc{min-height:94px;padding:3px}.band{font-size:9px;padding:2px 3px}.daytot{font-size:9.5px}.wsum .wp{font-size:14px}.kv{grid-template-columns:1fr 1fr}}
 </style>
 <div class="wrap">
   <header class="top">
@@ -155,7 +166,7 @@ td .note{display:block;font-size:10.5px;color:var(--ink3);font-weight:400;white-
     <div class="sec-h"><span class="n">02</span><h2>일자별 목표와 예산</h2><span class="m">단위 만원 | 목표 매출 / 광고 예산 / 실적</span></div>
     <div class="card">
       <div class="legend2"><span class="seg" role="group" aria-label="스토어 필터"><button type="button" data-f="all" aria-pressed="true">전체</button><button type="button" data-f="naver" aria-pressed="false">네이버</button><button type="button" data-f="own" aria-pressed="false">자사몰</button></span>
-        <span><span class="dot" style="background:var(--nav)"></span>네이버</span><span><span class="dot" style="background:var(--own)"></span>자사몰</span><span class="small">목 = 목표 매출, 예 = 광고 예산, 실 = 실적 매출</span></div>
+        <span><span class="dot" style="background:var(--nav)"></span>네이버</span><span><span class="dot" style="background:var(--own)"></span>자사몰</span><span class="small">각 칸 윗줄 = 매출 실/목표(달성%), 아랫줄 = 광고 집행/예산(소진%) · 단위 만원</span></div>
       <div class="cal2" id="cal"></div>
     </div>
   </section>
@@ -205,14 +216,49 @@ function tiles(P,a){
 }
 function cal(P,a){
   const el=document.getElementById("cal");
+  const asof=a.as_of;
   const first=new Date(P.days[0].date+"T00:00:00").getDay();
-  let h=["일","월","화","수","목","금","토"].map(x=>`<div class="hd">${x}</div>`).join("")+"<div></div>".repeat(first);
-  P.days.forEach((d,i)=>{
-    const tag=d.promo?`<span style="color:var(--accent);font-weight:600">${d.promo}</span>`:d.holiday?`<span style="color:var(--warn-ink)">${d.holiday}</span>`:"";
-    const band=(st)=>{const t=P.stores[st].daily_target[i],b=sumA(P.campaigns.filter(c=>c.store===st&&!c.conditional).map(c=>c.daily_budget[i])),s=(a.sales[d.date]||{})[st];
-      return `<div class="band ${st==="naver"?"n":"o"}"><b>${STORE[st].short}</b> 목 ${man(t)}<br>예 ${b?man(b):"OFF"} <span class="x">| 실 ${s==null?"-":man(s)}</span></div>`;};
-    h+=`<div class="dc ${d.holiday?"h":""} ${d.promo?"p":""}"><div class="d"><span>${Number(d.date.slice(8))}</span>${tag}</div>${filt!=="own"?band("naver"):""}${filt!=="naver"?band("own"):""}</div>`;
-  });
+  const stsFor=function(){ return filt==='all'?['naver','own']:[filt]; };
+  const r=function(v){ return v==null?"":'<span class="r">('+v+')</span>'; };
+  const dayBudget=function(st,i){ return sumA(P.campaigns.filter(c=>c.store===st&&!c.conditional).map(c=>c.daily_budget[i])); };
+  const daySpend=function(st,date){ return sumA(P.campaigns.filter(c=>c.store===st&&!c.conditional).map(c=>((a.ads[date]||{})[c.id]||{}).spend)); };
+
+  // 주 구성 (일요일 시작)
+  const weeks=[]; let cur=new Array(first).fill(null);
+  P.days.forEach((d,i)=>{ cur.push(i); if(cur.length===7){weeks.push(cur);cur=[];} });
+  if(cur.length){ while(cur.length<7)cur.push(null); weeks.push(cur); }
+
+  function band(st,i,date){
+    const t=P.stores[st].daily_target[i], s=(a.sales[date]||{})[st];
+    const b=dayBudget(st,i), sp=daySpend(st,date), adHas=a.ads[date]!=null;
+    const salesLine=man(s)+'/'+man(t)+((s!=null&&t)?r(pct(s/t,0)):"");
+    const adLine=b?((adHas?man(sp):"-")+'/'+man(b)+(adHas?r(pct(sp/b,0)):"")):'<span class="x">OFF</span>';
+    return '<div class="band '+(st==="naver"?"n":"o")+'"><div class="bt"><b>'+STORE[st].short+'</b></div>'
+      +'<div class="bl">'+salesLine+'</div><div class="bl ad">'+adLine+'</div></div>';
+  }
+
+  function dayCell(i){
+    if(i==null) return '<div class="dc empty"></div>';
+    const d=P.days[i], date=d.date;
+    const tag=d.promo?'<span style="color:var(--accent);font-weight:600">'+d.promo+'</span>':d.holiday?'<span style="color:var(--warn-ink)">'+d.holiday+'</span>':"";
+    const sts=stsFor(); let tTot=0,sTot=0,hasS=false;
+    sts.forEach(function(st){ tTot+=P.stores[st].daily_target[i]; const s=(a.sales[date]||{})[st]; if(s!=null){sTot+=s;hasS=true;} });
+    const top='<div class="daytot">매출 <b>'+(hasS?man(sTot):"-")+'</b>/'+man(tTot)+((hasS&&tTot)?r(pct(sTot/tTot,0)):"")+'</div>';
+    return '<div class="dc '+(d.holiday?"h":"")+' '+(d.promo?"p":"")+'"><div class="d"><span>'+Number(date.slice(8))+'</span>'+tag+'</div>'+top
+      +(filt!=="own"?band("naver",i,date):"")+(filt!=="naver"?band("own",i,date):"")+'</div>';
+  }
+
+  function weekCell(week){
+    const sts=stsFor(); let sA=0,sTe=0,sTfull=0,has=false;
+    week.forEach(function(i){ if(i==null)return; const date=P.days[i].date; const el2=asof&&date<=asof;
+      sts.forEach(function(st){ const t=P.stores[st].daily_target[i]; sTfull+=t; const s=(a.sales[date]||{})[st];
+        if(el2){ sTe+=t; if(s!=null){sA+=s;has=true;} } }); });
+    if(!has) return '<div class="wsum"><div class="wt">주간 목표</div><div class="wsub">'+man(sTfull)+'</div><div class="wsub">집계 전</div></div>';
+    return '<div class="wsum"><div class="wt">주간 달성</div><div class="wp">'+pct(sA/sTe,0)+'</div><div class="wsub">'+man(sA)+'/'+man(sTe)+'</div></div>';
+  }
+
+  let h='<div class="calhead">'+["일","월","화","수","목","금","토"].map(x=>'<div class="hd">'+x+'</div>').join("")+'<div class="hd">주간</div></div>';
+  weeks.forEach(function(w){ h+='<div class="week">'+w.map(dayCell).join("")+weekCell(w)+'</div>'; });
   el.innerHTML=h;
 }
 function media(P,a){
