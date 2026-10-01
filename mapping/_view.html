@@ -79,7 +79,7 @@ const API="/api/mm";
 function monthFromPath(){const m=(location.pathname.match(/(\d{4}-\d{2})/)||[])[1];return m||null;}
 const man=v=>v==null||!isFinite(v)?"-":Math.round(v/1e4).toLocaleString("ko-KR");
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const MT=["exact","keyword_in","adset_in","fallback","budget_only"];
+const MT=["exact","campaign_in","keyword_in","adset_in","fallback","budget_only"];
 const ST=["confirmed","provisional","pending","fallback","budget_only"];
 
 let MONTHS=[], cur=monthFromPath(), CAMP=[], rows=[], unmapped=[];

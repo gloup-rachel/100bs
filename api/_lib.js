@@ -154,6 +154,8 @@ function resolveCampaignId(ad, mapRows) {
   if (hit) return hit.campaign_id;
   hit = scoped.find((m) => m.match_type === 'exact' && m.campaign_name === camp);
   if (hit) return hit.campaign_id;
+  hit = scoped.find((m) => m.match_type === 'campaign_in' && m.campaign_name && camp && camp.indexOf(m.campaign_name) !== -1);
+  if (hit) return hit.campaign_id;
   hit = scoped.find((m) => m.match_type === 'fallback');
   if (hit) return hit.campaign_id;
   return 'unmapped';
