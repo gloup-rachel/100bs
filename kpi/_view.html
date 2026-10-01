@@ -324,7 +324,7 @@ function toActuals(r){const a={as_of:r.as_of||null,sales:{},ads:{},unmapped:r.un
 function warnings(P,a){
   const old=document.getElementById("warnbox"); if(old) old.remove();
   let extra=""; const um=a.unmapped;
-  if(um&&um.spend_novat>0){extra+='<div class="state" style="background:var(--warn-bg);color:var(--warn-ink);margin-top:8px"><b>unmapped 광고비 '+man(um.spend_novat)+'만</b> 매핑표에 없는 캠페인에 비용이 잡혔습니다. OFF 누락 또는 매핑 갱신 필요 (R14).</div>';}
+  if(um&&um.spend_novat>0){extra+='<div class="state" style="background:var(--warn-bg);color:var(--warn-ink);margin-top:8px"><b>unmapped 광고비 '+man(um.spend_novat)+'만</b> 매핑표에 없는 캠페인에 비용이 잡혔습니다. OFF 누락 또는 매핑 갱신 필요 (R14). <a href="/mapping/'+cur+'" style="color:inherit;font-weight:700;text-decoration:underline">매핑 체크 →</a></div>';}
   const pend=(MAP||[]).filter(m=>m.status==="pending");
   if(pend.length){extra+='<div class="state" style="background:var(--est-bg);color:var(--est-ink);margin-top:8px">매핑 <b>pending '+pend.length+'건</b>: '+pend.map(m=>m.campaign_id+(m.campaign_name?" "+m.campaign_name:"")).join(", ")+' 등록명 확정 후 매핑표 교체 필요.</div>';}
   if(extra) document.getElementById("state").insertAdjacentHTML("afterend",'<div id="warnbox">'+extra+'</div>');

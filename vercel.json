@@ -2,7 +2,8 @@
   "rewrites": [
     { "source": "/media-mix/:month(\\d{4}-\\d{2})/report", "destination": "/media-mix/_report.html" },
     { "source": "/media-mix/:month(\\d{4}-\\d{2})", "destination": "/media-mix/_view.html" },
-    { "source": "/kpi/:month(\\d{4}-\\d{2})", "destination": "/kpi/_view.html" }
+    { "source": "/kpi/:month(\\d{4}-\\d{2})", "destination": "/kpi/_view.html" },
+    { "source": "/mapping/:month(\\d{4}-\\d{2})", "destination": "/mapping/_view.html" }
   ],
   "crons": [
     { "path": "/api/mm/cron", "schedule": "0 21 * * *" }

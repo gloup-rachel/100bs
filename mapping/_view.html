@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>백년밥상 광고 매핑 체크</title>
+<script src="/mm-gate.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--ink:#15171c;--ink2:#4b5060;--ink3:#8a8f9c;--line:#e4e6eb;--line2:#eef0f3;--head:#f6f7f9;--accent:#3b34c7;--nav:#1d9a55;--own:#d4652c;--warn-bg:#fff5de;--warn-ink:#8a5a00;--ok-bg:#e3f4ea;--ok-ink:#1d7a45;--danger:#c0392b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111317;--card:#191c21;--ink:#eceef2;--ink2:#b3b8c4;--ink3:#7d8391;--line:#2a2e36;--line2:#23262d;--head:#1f2228;--accent:#8e88ff;--nav:#4cc783;--own:#f08a52;--warn-bg:#3a2e12;--warn-ink:#f0c870;--ok-bg:#183526;--ok-ink:#4cc783;--danger:#ef6b5e;color-scheme:dark}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo",sans-serif;font-size:14px;line-height:1.5;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 18px 80px;display:flex;flex-direction:column;gap:20px}
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+h1{font-size:21px;margin:0;font-weight:700}
+header.top p{margin:4px 0 0;color:var(--ink2);font-size:13px}
+.sel{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--card);color:var(--ink)}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 16px 6px}
+.sec h2{font-size:15px;margin:0 0 4px}
+.sec .m{color:var(--ink3);font-size:12.5px;margin-bottom:10px}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.8px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap;vertical-align:middle}
+th{background:var(--head);color:var(--ink2);font-weight:600;font-size:12px;position:sticky;top:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;font-weight:600}
+.chip.n{background:var(--ok-bg);color:var(--nav)}
+.chip.o{background:#fbeee6;color:var(--own)}
+.chip.none{background:var(--warn-bg);color:var(--warn-ink)}
+input.f,select.f{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:var(--card);color:var(--ink);max-width:170px}
+input.f:focus,select.f:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:8px;padding:7px 12px;background:var(--card);color:var(--ink);cursor:pointer}
+.btn.p{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.btn.sm{font-size:12px;padding:4px 9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;bottom:0;background:var(--bg);padding:12px 0;border-top:1px solid var(--line);margin-top:4px}
+.dup{outline:2px solid var(--danger);outline-offset:1px}
+.state{font-size:13px;border-radius:10px;padding:10px 14px}
+.state.warn{background:var(--warn-bg);color:var(--warn-ink)}
+.state.ok{background:var(--ok-bg);color:var(--ok-ink)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+small.hint{color:var(--ink3);font-size:11.5px}
+a.back{color:var(--ink2);font-size:13px;text-decoration:none}
+</style>
+</head><body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>광고 매핑 체크</h1>
+      <p>라플라스 캠페인을 플랜 캠페인에 매핑합니다. 저장 후 "재매핑 실행"하면 저장된 실적에 즉시 반영돼요. <a class="back" id="backlink" href="/kpi">← KPI로</a></p>
+    </div>
+    <label class="tag" for="month">월 <select id="month" class="sel"></select></label>
+  </header>
+
+  <div id="msg"></div>
+
+  <section class="sec">
+    <h2>미매핑 캠페인 <span id="umcount" class="chip none"></span></h2>
+    <div class="m">campaign_id='unmapped'로 잡힌 라플라스 캠페인 (광고비 순). 오른쪽에서 플랜 캠페인을 골라 "매핑"을 누르면 아래 매핑표에 추가됩니다.</div>
+    <div class="tbl-wrap"><table id="umtbl"></table></div>
+  </section>
+
+  <section class="sec">
+    <h2>매핑표 (편집)</h2>
+    <div class="m">플랜 캠페인 1개당 1행. 여러 라플라스 캠페인을 한 플랜에 묶으려면 매칭=keyword_in/adset_in/fallback 사용. 빨간 테두리는 campaign_id 중복.</div>
+    <div class="tbl-wrap"><table id="maptbl"></table></div>
+    <div style="padding:10px 0"><button class="btn sm" id="addrow">+ 행 추가</button></div>
+  </section>
+
+  <div class="row-actions">
+    <button class="btn p" id="saveremap">저장 + 재매핑 실행</button>
+    <button class="btn" id="save">저장만</button>
+    <button class="btn" id="reload">새로고침</button>
+    <span id="savemsg" class="hint"></span>
+  </div>
+</div>
+
+<script>
+const API="/api/mm";
+function monthFromPath(){const m=(location.pathname.match(/(\d{4}-\d{2})/)||[])[1];return m||null;}
+const man=v=>v==null||!isFinite(v)?"-":Math.round(v/1e4).toLocaleString("ko-KR");
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const MT=["exact","keyword_in","adset_in","fallback","budget_only"];
+const ST=["confirmed","provisional","pending","fallback","budget_only"];
+
+let MONTHS=[], cur=monthFromPath(), CAMP=[], rows=[], unmapped=[];
+const sel=document.getElementById("month");
+sel.addEventListener("change",()=>{ location.href="/mapping/"+sel.value; });
+document.getElementById("backlink").addEventListener("click",e=>{ e.preventDefault(); location.href="/kpi/"+cur; });
+
+function campOptions(storeFilter, selected){
+  let list=CAMP;
+  if(storeFilter) { const f=CAMP.filter(c=>c.store===storeFilter); if(f.length) list=f; }
+  let o='<option value="">— 플랜 캠페인 —</option>';
+  list.forEach(c=>{ o+=`<option value="${esc(c.id)}" ${c.id===selected?"selected":""}>${esc(c.id)} · ${esc(c.name)}</option>`; });
+  // selected 가 목록에 없으면 추가
+  if(selected && !list.some(c=>c.id===selected)) o+=`<option value="${esc(selected)}" selected>${esc(selected)}</option>`;
+  return o;
+}
+
+function renderUnmapped(){
+  document.getElementById("umcount").textContent = unmapped.length ? (unmapped.length+"건 · "+man(unmapped.reduce((s,x)=>s+x.spend,0))+"만") : "0건";
+  const t=document.getElementById("umtbl");
+  if(!unmapped.length){ t.innerHTML='<tbody><tr><td style="color:var(--ink3)">미매핑 캠페인이 없습니다. 👍</td></tr></tbody>'; return; }
+  let h='<thead><tr><th>스토어</th><th>계정</th><th>채널</th><th>캠페인명</th><th>광고그룹</th><th class="num">광고비(만)</th><th>→ 플랜 캠페인</th><th></th></tr></thead><tbody>';
+  unmapped.forEach((u,i)=>{
+    const chip=u.store==="naver"?'<span class="chip n">네이버</span>':u.store==="own"?'<span class="chip o">자사몰</span>':'<span class="chip none">미분류</span>';
+    h+=`<tr data-i="${i}">
+      <td>${chip}</td><td>${esc(u.ad_account_name)}</td><td>${esc(u.ad_channel_name)}</td>
+      <td>${esc(u.campaign_name)||'<span class="hint">(없음)</span>'}</td><td>${esc(u.adset_name)||""}</td>
+      <td class="num">${man(u.spend)}</td>
+      <td><select class="f um-sel">${campOptions(u.store,"")}</select></td>
+      <td><button class="btn sm um-assign">매핑</button></td></tr>`;
+  });
+  t.innerHTML=h+"</tbody>";
+  t.querySelectorAll(".um-assign").forEach(btn=>btn.addEventListener("click",function(){
+    const tr=this.closest("tr"); const i=+tr.dataset.i; const cid=tr.querySelector(".um-sel").value;
+    if(!cid){ flash("플랜 캠페인을 먼저 선택하세요.",true); return; }
+    assign(unmapped[i], cid);
+  }));
+}
+
+function assign(u, cid){
+  // 해당 플랜 id 행이 있으면 갱신(덮어쓰기), 없으면 추가 — exact 매칭
+  let row=rows.find(r=>r.campaign_id===cid);
+  const data={campaign_id:cid, ad_account_name:u.ad_account_name, ad_channel_name:u.ad_channel_name, campaign_name:u.campaign_name, adset_name:u.adset_name||"", keyword:"", match_type:"exact", status:"confirmed", note:"매핑 체크로 추가"};
+  if(row){ Object.assign(row,data); flash(cid+" 규칙을 이 캠페인으로 덮어썼습니다. (여러 개면 keyword_in 권장)"); }
+  else { rows.push(data); flash(cid+" 매핑 추가됨. 저장 후 재매핑하세요."); }
+  renderTable();
+  document.getElementById("maptbl").scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function renderTable(){
+  const t=document.getElementById("maptbl");
+  const counts={}; rows.forEach(r=>counts[r.campaign_id]=(counts[r.campaign_id]||0)+1);
+  let h='<thead><tr><th>campaign_id</th><th>계정(ad_account_name)</th><th>채널</th><th>campaign_name</th><th>adset_name</th><th>keyword</th><th>매칭</th><th>status</th><th>note</th><th></th></tr></thead><tbody>';
+  rows.forEach((r,i)=>{
+    const dup=counts[r.campaign_id]>1?"dup":"";
+    h+=`<tr data-i="${i}">
+      <td><select class="f fld ${dup}" data-k="campaign_id">${campOptions(null,r.campaign_id)}</select></td>
+      <td><input class="f fld" data-k="ad_account_name" value="${esc(r.ad_account_name)}"></td>
+      <td><input class="f fld" data-k="ad_channel_name" value="${esc(r.ad_channel_name)}" style="max-width:120px"></td>
+      <td><input class="f fld" data-k="campaign_name" value="${esc(r.campaign_name)}"></td>
+      <td><input class="f fld" data-k="adset_name" value="${esc(r.adset_name)}" style="max-width:120px"></td>
+      <td><input class="f fld" data-k="keyword" value="${esc(r.keyword)}" style="max-width:110px"></td>
+      <td><select class="f fld" data-k="match_type" style="max-width:110px">${MT.map(x=>`<option ${x===r.match_type?"selected":""}>${x}</option>`).join("")}</select></td>
+      <td><select class="f fld" data-k="status" style="max-width:110px">${ST.map(x=>`<option ${x===r.status?"selected":""}>${x}</option>`).join("")}</select></td>
+      <td><input class="f fld" data-k="note" value="${esc(r.note)}" style="max-width:140px"></td>
+      <td><button class="btn sm del">삭제</button></td></tr>`;
+  });
+  t.innerHTML=h+"</tbody>";
+  t.querySelectorAll(".fld").forEach(el=>el.addEventListener("change",function(){
+    const i=+this.closest("tr").dataset.i; rows[i][this.dataset.k]=this.value; if(this.dataset.k==="campaign_id") renderTable();
+  }));
+  t.querySelectorAll(".del").forEach(btn=>btn.addEventListener("click",function(){
+    const i=+this.closest("tr").dataset.i; rows.splice(i,1); renderTable();
+  }));
+}
+
+function flash(t,warn){ const m=document.getElementById("savemsg"); m.textContent=t; m.style.color=warn?"var(--danger)":"var(--ink3)"; }
+function banner(html,cls){ document.getElementById("msg").innerHTML = html?`<div class="state ${cls||'warn'}">${html}</div>`:""; }
+
+async function loadAll(){
+  try{ MONTHS=(((await fetch(API+"/months").then(r=>r.json()))||{}).months||[]).slice(); }catch(e){ MONTHS=[]; }
+  if(cur&&!MONTHS.includes(cur)) MONTHS.unshift(cur);
+  MONTHS=[...new Set(MONTHS)].sort().reverse(); if(!cur)cur=MONTHS[0];
+  sel.innerHTML=""; MONTHS.forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=k.replace("-","년 ")+"월";sel.appendChild(o);}); if(cur)sel.value=cur;
+  if(!cur){ banner("등록된 월이 없습니다."); return; }
+  let mp; try{ mp=await fetch(API+"/map?month="+encodeURIComponent(cur)).then(r=>r.json()); }catch(e){}
+  if(!mp||mp.error){ banner("매핑표 불러오기 실패: "+((mp&&mp.error)||"")); return; }
+  CAMP=mp.campaigns||[]; rows=(mp.campaign_map||[]).map(r=>({campaign_id:r.campaign_id,ad_account_name:r.ad_account_name||"",ad_channel_name:r.ad_channel_name||"",campaign_name:r.campaign_name||"",adset_name:r.adset_name||"",keyword:r.keyword||"",match_type:r.match_type||"exact",status:r.status||"confirmed",note:r.note||""}));
+  try{ const um=await fetch(API+"/unmapped?month="+encodeURIComponent(cur)).then(r=>r.json()); unmapped=(um&&um.items)||[]; }catch(e){ unmapped=[]; }
+  banner(unmapped.length?`미매핑 <b>${unmapped.length}건</b> · 광고비 합계 <b>${man(unmapped.reduce((s,x)=>s+x.spend,0))}만</b> — 아래에서 매핑 후 저장·재매핑하세요.`:"미매핑 없음. 매핑표만 점검하셔도 됩니다.", unmapped.length?"warn":"ok");
+  renderUnmapped(); renderTable();
+}
+
+async function doSave(){
+  flash("저장 중...");
+  const r=await fetch(API+"/map?month="+encodeURIComponent(cur),{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({rows})});
+  const j=await r.json();
+  if(!r.ok||!j.ok){ flash("저장 실패: "+((j&&j.error)||r.status),true); return false; }
+  flash("저장됨 ("+j.rows+"행).");
+  return true;
+}
+async function doRemap(){
+  flash("재매핑 실행 중...");
+  const r=await fetch(API+"/remap?month="+encodeURIComponent(cur),{method:"POST",headers:{"content-type":"application/json"}});
+  const j=await r.json();
+  if(!r.ok||!j.ok){ flash("재매핑 실패: "+((j&&j.error)||r.status),true); return; }
+  flash(`재매핑 완료 · 변경 ${j.changed}건 · 남은 미매핑 ${j.still_unmapped}건`);
+  await loadAll();
+}
+
+document.getElementById("save").addEventListener("click",doSave);
+document.getElementById("saveremap").addEventListener("click",async()=>{ if(await doSave()) await doRemap(); });
+document.getElementById("reload").addEventListener("click",loadAll);
+document.getElementById("addrow").addEventListener("click",()=>{ rows.push({campaign_id:"",ad_account_name:"",ad_channel_name:"",campaign_name:"",adset_name:"",keyword:"",match_type:"exact",status:"provisional",note:""}); renderTable(); });
+
+loadAll();
+</script>
+</body></html>
