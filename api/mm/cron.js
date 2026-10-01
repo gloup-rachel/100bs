@@ -1,4 +1,4 @@
-/* GET /api/mm/cron  — 라플라스 D-3~D-1 자동 적재 (Vercel Cron 매일 실행)
+/* GET /api/mm/cron  — 라플라스 D-3~D-1 자동 적재 (Vercel Cron 매일 06:00 KST = 21:00 UTC)
  *   인증: x-ingest-key(MM_INGEST_KEY) 또는 Authorization: Bearer <CRON_SECRET>
  *   백필: ?start=YYYY-MM-DD&end=YYYY-MM-DD (기본 = 그그제~어제, KST)
  *

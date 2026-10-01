@@ -123,7 +123,7 @@ td .note{display:block;font-size:10.5px;color:var(--ink3);font-weight:400;white-
 .kv div{background:var(--head);border-radius:8px;padding:8px 10px}
 .kv .k{font-size:11px;color:var(--ink2)}.kv .v{font-weight:700;font-size:15px}
 .cal2{padding:16px;display:flex;flex-direction:column;gap:6px}
-.calhead,.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(64px,.92fr);gap:6px}
+.calhead,.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(42px,.5fr);gap:6px}
 .cal2 .hd{font-size:11px;color:var(--ink3);text-align:center}
 .dc{border:1px solid var(--line2);border-radius:8px;padding:5px;display:flex;flex-direction:column;gap:3px;min-height:104px}
 .dc.empty{border:0;background:transparent;min-height:0}
@@ -144,6 +144,10 @@ td .note{display:block;font-size:10.5px;color:var(--ink3);font-weight:400;white-
 .wsum .wt{font-size:10px;color:var(--ink3)}
 .wsum .wp{font-size:17px;font-weight:700;color:var(--accent);line-height:1.1}
 .wsum .wsub{font-size:10px;color:var(--ink2);font-variant-numeric:tabular-nums}
+.dc.pre{background:var(--est-bg);border-color:transparent;opacity:.92}
+.dc.pre .daytot{border-bottom-color:var(--line)}
+.pretag{font-size:9px;background:var(--est-ink);color:var(--card);border-radius:4px;padding:0 4px;font-weight:600}
+.pread{font-size:10px;color:var(--ink3);font-variant-numeric:tabular-nums;margin-top:1px}
 .legend2{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 16px 0;font-size:12px;color:var(--ink2)}
 .seg button{min-width:56px}
 .ach{font-weight:700}
@@ -166,7 +170,7 @@ td .note{display:block;font-size:10.5px;color:var(--ink3);font-weight:400;white-
     <div class="sec-h"><span class="n">02</span><h2>일자별 목표와 예산</h2><span class="m">단위 만원 | 목표 매출 / 광고 예산 / 실적</span></div>
     <div class="card">
       <div class="legend2"><span class="seg" role="group" aria-label="스토어 필터"><button type="button" data-f="all" aria-pressed="true">전체</button><button type="button" data-f="naver" aria-pressed="false">네이버</button><button type="button" data-f="own" aria-pressed="false">자사몰</button></span>
-        <span><span class="dot" style="background:var(--nav)"></span>네이버</span><span><span class="dot" style="background:var(--own)"></span>자사몰</span><span class="small">각 칸 윗줄 = 매출 실/목표(달성%), 아랫줄 = 광고 집행/예산(소진%) · 단위 만원</span></div>
+        <span><span class="dot" style="background:var(--nav)"></span>네이버</span><span><span class="dot" style="background:var(--own)"></span>자사몰</span><span class="small">각 칸 윗줄 = 매출 실/목표(달성%), 아랫줄 = 광고 집행/예산(소진%) · 회색 "선행"칸(9월)은 실적 참고용(10월 성과 미포함) · 단위 만원</span></div>
       <div class="cal2" id="cal"></div>
     </div>
   </section>
@@ -217,16 +221,15 @@ function tiles(P,a){
 function cal(P,a){
   const el=document.getElementById("cal");
   const asof=a.as_of;
-  const first=new Date(P.days[0].date+"T00:00:00").getDay();
+  const firstDate=P.days[0].date;
+  const first=new Date(firstDate+"T00:00:00Z").getUTCDay();
+  const len=P.days.length;
   const stsFor=function(){ return filt==='all'?['naver','own']:[filt]; };
   const r=function(v){ return v==null?"":'<span class="r">('+v+')</span>'; };
   const dayBudget=function(st,i){ return sumA(P.campaigns.filter(c=>c.store===st&&!c.conditional).map(c=>c.daily_budget[i])); };
   const daySpend=function(st,date){ return sumA(P.campaigns.filter(c=>c.store===st&&!c.conditional).map(c=>((a.ads[date]||{})[c.id]||{}).spend)); };
-
-  // 주 구성 (일요일 시작)
-  const weeks=[]; let cur=new Array(first).fill(null);
-  P.days.forEach((d,i)=>{ cur.push(i); if(cur.length===7){weeks.push(cur);cur=[];} });
-  if(cur.length){ while(cur.length<7)cur.push(null); weeks.push(cur); }
+  const hasData=function(date){ return !!(a.sales[date]||a.ads[date]); };
+  const totalSpend=function(date){ return a.ads[date]?Object.values(a.ads[date]).reduce(function(x,y){return x+(y.spend||0);},0):null; };
 
   function band(st,i,date){
     const t=P.stores[st].daily_target[i], s=(a.sales[date]||{})[st];
@@ -238,7 +241,6 @@ function cal(P,a){
   }
 
   function dayCell(i){
-    if(i==null) return '<div class="dc empty"></div>';
     const d=P.days[i], date=d.date;
     const tag=d.promo?'<span style="color:var(--accent);font-weight:600">'+d.promo+'</span>':d.holiday?'<span style="color:var(--warn-ink)">'+d.holiday+'</span>':"";
     const sts=stsFor(); let tTot=0,sTot=0,hasS=false;
@@ -248,17 +250,43 @@ function cal(P,a){
       +(filt!=="own"?band("naver",i,date):"")+(filt!=="naver"?band("own",i,date):"")+'</div>';
   }
 
-  function weekCell(week){
+  // 선행일(plan 시작 전, 1주차 앞칸): 실적만 표시, 10월 성과·목표엔 미포함
+  function preCell(date){
+    const sts=stsFor(); let sTot=0,hasS=false;
+    sts.forEach(function(st){ const s=(a.sales[date]||{})[st]; if(s!=null){sTot+=s;hasS=true;} });
+    const sp=totalSpend(date);
+    const line=function(st){ const s=(a.sales[date]||{})[st]; return '<div class="band '+(st==="naver"?"n":"o")+'"><div class="bt"><b>'+STORE[st].short+'</b></div><div class="bl">'+man(s)+'</div></div>'; };
+    return '<div class="dc pre"><div class="d"><span>'+Number(date.slice(5,7))+'/'+Number(date.slice(8))+'</span><span class="pretag">선행</span></div>'
+      +'<div class="daytot">매출 <b>'+(hasS?man(sTot):"-")+'</b></div>'
+      +(filt!=="own"?line("naver"):"")+(filt!=="naver"?line("own"):"")
+      +'<div class="pread">광고 '+(sp==null?"-":man(sp))+'</div></div>';
+  }
+
+  // 주간 요약: 10월 날짜만 집계 (선행일 제외)
+  function weekCell(idxs){
+    if(!idxs.length) return '<div class="wsum"></div>';
     const sts=stsFor(); let sA=0,sTe=0,sTfull=0,has=false;
-    week.forEach(function(i){ if(i==null)return; const date=P.days[i].date; const el2=asof&&date<=asof;
+    idxs.forEach(function(i){ const date=P.days[i].date; const el2=asof&&date<=asof;
       sts.forEach(function(st){ const t=P.stores[st].daily_target[i]; sTfull+=t; const s=(a.sales[date]||{})[st];
         if(el2){ sTe+=t; if(s!=null){sA+=s;has=true;} } }); });
     if(!has) return '<div class="wsum"><div class="wt">주간 목표</div><div class="wsub">'+man(sTfull)+'</div><div class="wsub">집계 전</div></div>';
     return '<div class="wsum"><div class="wt">주간 달성</div><div class="wp">'+pct(sA/sTe,0)+'</div><div class="wsub">'+man(sA)+'/'+man(sTe)+'</div></div>';
   }
 
+  const gridStart=shiftDate(firstDate,-first);
+  const totalCells=Math.ceil((first+len)/7)*7;
   let h='<div class="calhead">'+["일","월","화","수","목","금","토"].map(x=>'<div class="hd">'+x+'</div>').join("")+'<div class="hd">주간</div></div>';
-  weeks.forEach(function(w){ h+='<div class="week">'+w.map(dayCell).join("")+weekCell(w)+'</div>'; });
+  for(let g=0; g<totalCells; g+=7){
+    let row='<div class="week">'; const octIdx=[];
+    for(let p=0;p<7;p++){
+      const gg=g+p, date=shiftDate(gridStart,gg);
+      const i=(gg>=first && gg<first+len)? gg-first : null;
+      if(i!=null){ row+=dayCell(i); octIdx.push(i); }
+      else if(gg<first && hasData(date)){ row+=preCell(date); }
+      else row+='<div class="dc empty"></div>';
+    }
+    h+=row+weekCell(octIdx)+'</div>';
+  }
   el.innerHTML=h;
 }
 function media(P,a){
@@ -273,11 +301,12 @@ function media(P,a){
   });
   document.getElementById("media").innerHTML=h+"</tbody>";
 }
-function render(){const P=PLANS[cur],a=A();tiles(P,a);leadStrip(P,a);cal(P,a);media(P,a);warnings(P,a);}
+function render(){const P=PLANS[cur],a=A();tiles(P,a);cal(P,a);media(P,a);warnings(P,a);}
 const LEAD_DAYS=10;
 function prevMonth(m){const p=m.split("-").map(Number);return p[1]===1?(p[0]-1)+"-12":p[0]+"-"+String(p[1]-1).padStart(2,"0");}
-function shiftDate(iso,delta){const d=new Date(iso+"T00:00:00");d.setDate(d.getDate()+delta);return d.toISOString().slice(0,10);}
+function shiftDate(iso,delta){const d=new Date(iso+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+delta);return d.toISOString().slice(0,10);}
 function leadStrip(P,a){
+  return; // 선행일은 달력 1주차 앞칸에 통합됨 (미사용)
   const cal=document.getElementById("cal"); let box=document.getElementById("lead");
   const start=(P.days[0]||{}).date;
   const days=start?[...new Set([...Object.keys(a.sales||{}),...Object.keys(a.ads||{})])].filter(d=>d<start&&d>=shiftDate(start,-LEAD_DAYS)).sort():[];
