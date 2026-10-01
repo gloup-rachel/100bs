@@ -1,6 +1,6 @@
 /* GET /api/mm/cron  — 라플라스 D-3~D-1 자동 적재 (Vercel Cron 매일 실행)
  *   인증: x-ingest-key(MM_INGEST_KEY) 또는 Authorization: Bearer <CRON_SECRET>
- *   백필: ?start=YYYY-MM-DD&end=YYYY-MM-DD (기본 = 어제~그제~그그제, KST)
+ *   백필: ?start=YYYY-MM-DD&end=YYYY-MM-DD (기본 = 그그제~어제, KST)
  *
  * 규칙(확정):
  *   - 스토어: channel_name CAFE_24→own, SMARTSTORE→naver
@@ -9,6 +9,8 @@
  *   - 광고: spend(=VAT제외), 전환=action_cnt, 전환매출=action_value (CBT 계정만 shared_purchase_action_value)
  *   - 스토어 분류 안 되는 광고 계정(farmtt 등)은 제외
  *   - 매핑은 campaign_map(해당 월)으로 서버 수행, 미매칭 unmapped
+ *
+ * 라플라스 응답이 커서(content budget) 하루 단위로 조회하고, keyword 차원은 제외(캠페인+광고그룹 단위).
  */
 const { queryRecords, AGG } = require('../_laplace');
 const { sbSelect, sbUpsert, sbDelete, storeOfAccount, resolveCampaignId, monthOf, json } = require('../_lib');
@@ -25,9 +27,24 @@ function authed(req) {
 
 function kstToday() { return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10); }
 function addDays(iso, n) { const d = new Date(iso + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
-function dOnly(t) { return String(t || '').slice(0, 10); }
 function num(x) { return Math.round(Number(x || 0)); }
 function datesInRange(s, e) { const out = []; for (let d = s; d <= e; d = addDays(d, 1)) out.push(d); return out; }
+function dayFilter(date) { return { type: 'fixed', start_datetime_id: date + 'T00:00:00.000', end_datetime_id: date + 'T23:59:59.999', tz: 'kst' }; }
+
+async function pullAds(date) {
+  return queryRecords('commerce_ad', {
+    freq: 'day', date_filters: dayFilter(date),
+    dimensions: [{ name: 'ad_account_name' }, { name: 'ad_channel_name' }, { name: 'campaign_name' }, { name: 'adset_name' }],
+    measures: [AGG('spend'), AGG('impressions'), AGG('clicks'), AGG('action_cnt'), AGG('action_value'), AGG('shared_purchase_action_value')],
+  });
+}
+async function pullSales(date) {
+  return queryRecords('commerce_order', {
+    freq: 'day', date_filters: dayFilter(date),
+    dimensions: [{ name: 'channel_name' }],
+    measures: [AGG('sales'), AGG('delivery_fee'), AGG('used_reward'), AGG('pay_cnt', { col: 'order_id', f: 'count_distinct' })],
+  });
+}
 
 module.exports = async (req, res) => {
   if (!authed(req)) return json(res, 401, { error: 'unauthorized' });
@@ -37,35 +54,20 @@ module.exports = async (req, res) => {
   const end = /^\d{4}-\d{2}-\d{2}$/.test(q.end || '') ? q.end : addDays(today, -1);
   if (start > end) return json(res, 400, { error: 'range_invalid', start, end });
 
-  const df = { type: 'fixed', start_datetime_id: start + 'T00:00:00.000', end_datetime_id: end + 'T23:59:59.999', tz: 'kst' };
+  const mapCache = {};
+  const mapFor = async (m) => { if (!mapCache[m]) mapCache[m] = await sbSelect('bb_mm_campaign_map', `month=eq.${encodeURIComponent(m)}&select=*`); return mapCache[m]; };
 
   try {
-    // 1) 라플라스 조회
-    const adRows = await queryRecords('commerce_ad', {
-      freq: 'day', date_filters: df,
-      dimensions: [{ name: 'ad_account_name' }, { name: 'ad_channel_name' }, { name: 'campaign_name' }, { name: 'adset_name' }, { name: 'keyword' }],
-      measures: [AGG('spend'), AGG('impressions'), AGG('clicks'), AGG('action_cnt'), AGG('action_value'), AGG('shared_purchase_action_value')],
-    });
-    const orderRows = await queryRecords('commerce_order', {
-      freq: 'day', date_filters: df,
-      dimensions: [{ name: 'channel_name' }],
-      measures: [AGG('sales'), AGG('delivery_fee'), AGG('used_reward'), AGG('pay_cnt', { col: 'order_id', f: 'count_distinct' })],
-    });
-
-    // 2) 월별 campaign_map 캐시
-    const mapCache = {};
-    const mapFor = async (m) => { if (!mapCache[m]) mapCache[m] = await sbSelect('bb_mm_campaign_map', `month=eq.${encodeURIComponent(m)}&select=*`); return mapCache[m]; };
-
-    const now = new Date().toISOString();
     const summary = [];
-
     for (const date of datesInRange(start, end)) {
       const month = monthOf(date);
       const mapRows = await mapFor(month);
+      const now = new Date().toISOString();
 
       // --- 매출 ---
+      const orderRows = await pullSales(date);
       const salesRows = [];
-      for (const r of orderRows.filter((x) => dOnly(x.time_id) === date)) {
+      for (const r of orderRows) {
         const store = r.channel_name === 'CAFE_24' ? 'own' : (r.channel_name === 'SMARTSTORE' ? 'naver' : null);
         if (!store) continue;
         const net = store === 'own' ? (num(r.sales) - num(r.delivery_fee) - num(r.used_reward)) : num(r.sales);
@@ -73,21 +75,22 @@ module.exports = async (req, res) => {
       }
 
       // --- 광고 ---
+      const adRows = await pullAds(date);
       const adOut = [];
       const unmapped = { spend_novat: 0, count: 0 };
-      for (const r of adRows.filter((x) => dOnly(x.time_id) === date)) {
+      for (const r of adRows) {
         const acc = r.ad_account_name;
         if (storeOfAccount(acc) === null) continue; // 우리 매체 계정만
         const ad = {
           ad_account_name: acc, ad_channel_name: r.ad_channel_name || '',
-          campaign_name: r.campaign_name || '', adset_name: r.adset_name || '', keyword: r.keyword || '',
+          campaign_name: r.campaign_name || '', adset_name: r.adset_name || '', keyword: '',
         };
         const cid = resolveCampaignId(ad, mapRows);
         const value = acc === CBT_ACCOUNT ? num(r.shared_purchase_action_value) : num(r.action_value);
         if (cid === 'unmapped') { unmapped.spend_novat += num(r.spend); unmapped.count += 1; }
         adOut.push({
           date, ad_account_name: acc, ad_channel_name: ad.ad_channel_name,
-          campaign_name: ad.campaign_name, adset_name: ad.adset_name, keyword: ad.keyword,
+          campaign_name: ad.campaign_name, adset_name: ad.adset_name, keyword: '',
           campaign_id: cid,
           spend_novat: num(r.spend), impressions: num(r.impressions), clicks: num(r.clicks),
           conversions: Number(r.action_cnt || 0), value, ingested_at: now,

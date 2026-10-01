@@ -88,14 +88,16 @@ async function callTool(name, args, opts) {
   if (!msg) { const e = new Error('MCP_NO_MESSAGE_' + r.raw); e.trace = trace; throw e; }
   if (msg.error) { const e = new Error('MCP_TOOL_ERROR_' + JSON.stringify(msg.error).slice(0, 400)); e.trace = trace; throw e; }
 
-  // content: [{type:'text', text:'...json...'}]
+  // 우선순위: structuredContent (대용량 응답 시 content는 생략될 수 있음) → content[].text
   let data = null;
-  const content = msg.result && msg.result.content;
-  if (Array.isArray(content)) {
-    const t = content.filter((c) => c && c.type === 'text').map((c) => c.text).join('');
+  const result = msg.result || {};
+  if (result.structuredContent != null) {
+    data = result.structuredContent;
+  } else if (Array.isArray(result.content)) {
+    const t = result.content.filter((c) => c && c.type === 'text').map((c) => c.text).join('');
     try { data = JSON.parse(t); } catch (e) { data = t; }
   } else {
-    data = msg.result;
+    data = result;
   }
   return debug ? { data, trace, sid } : data;
 }
