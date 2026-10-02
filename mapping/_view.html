@@ -60,6 +60,12 @@ a.back{color:var(--ink2);font-size:13px;text-decoration:none}
   </section>
 
   <section class="sec">
+    <h2>(기존) 단품에 묶인 캠페인 <span id="oldcount" class="chip n"></span></h2>
+    <div class="m">현재 (기존)단품(SHOP_OLD)으로 집계되는 라플라스 캠페인. <b>"→ 신규"</b>를 누르면 (신규)단품(SHOP_NEW) 리스트에 복사·추가됩니다. 저장 + 재매핑하면 신규 버킷으로 이동해요.</div>
+    <div class="tbl-wrap"><table id="oldtbl"></table></div>
+  </section>
+
+  <section class="sec">
     <h2>매핑표 (편집)</h2>
     <div class="m">플랜 캠페인 1개당 1행. 여러 라플라스 캠페인을 한 플랜에 묶으려면 매칭=keyword_in/adset_in/fallback 사용. 빨간 테두리는 campaign_id 중복.</div>
     <div class="tbl-wrap"><table id="maptbl"></table></div>
@@ -79,10 +85,10 @@ const API="/api/mm";
 function monthFromPath(){const m=(location.pathname.match(/(\d{4}-\d{2})/)||[])[1];return m||null;}
 const man=v=>v==null||!isFinite(v)?"-":Math.round(v/1e4).toLocaleString("ko-KR");
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const MT=["exact","campaign_in","keyword_in","adset_in","fallback","budget_only"];
+const MT=["exact","campaign_in","campaign_list","keyword_in","adset_in","fallback","budget_only"];
 const ST=["confirmed","provisional","pending","fallback","budget_only"];
 
-let MONTHS=[], cur=monthFromPath(), CAMP=[], rows=[], unmapped=[];
+let MONTHS=[], cur=monthFromPath(), CAMP=[], rows=[], unmapped=[], adcams=[];
 const sel=document.getElementById("month");
 sel.addEventListener("change",()=>{ location.href="/mapping/"+sel.value; });
 document.getElementById("backlink").addEventListener("click",e=>{ e.preventDefault(); location.href="/kpi/"+cur; });
@@ -129,6 +135,32 @@ function assign(u, cid){
   document.getElementById("maptbl").scrollIntoView({behavior:"smooth",block:"center"});
 }
 
+function newList(){ const r=rows.find(x=>x.campaign_id==='SHOP_NEW'); return r?((r.keyword||'').split('|').map(s=>s.trim()).filter(Boolean)):[]; }
+function promoteToNew(name){
+  if(!name){ flash("캠페인명이 없습니다.",true); return; }
+  let row=rows.find(r=>r.campaign_id==='SHOP_NEW');
+  if(!row){ row={campaign_id:'SHOP_NEW',ad_account_name:'pym12',ad_channel_name:'NAVER_SEARCHAD',campaign_name:null,adset_name:null,keyword:'',match_type:'campaign_list',status:'confirmed',note:'신규 단품 리스트'}; rows.push(row); }
+  row.match_type='campaign_list';
+  const list=(row.keyword||'').split('|').map(s=>s.trim()).filter(Boolean);
+  if(list.indexOf(name)!==-1){ flash("이미 신규에 있음: "+name); return; }
+  list.push(name); row.keyword=list.join('|');
+  flash("신규(SHOP_NEW)에 추가: "+name+" — 저장 + 재매핑하세요.");
+  renderTable(); renderOld();
+}
+function renderOld(){
+  const t=document.getElementById("oldtbl"); if(!t) return;
+  const inNew=newList();
+  const olds=adcams.filter(c=>c.campaign_id==='SHOP_OLD');
+  const el=document.getElementById("oldcount"); if(el) el.textContent=olds.length+"개";
+  if(!olds.length){ t.innerHTML='<tbody><tr><td style="color:var(--ink3)">SHOP_OLD로 집계된 캠페인이 아직 없습니다.</td></tr></tbody>'; return; }
+  let h='<thead><tr><th>계정</th><th>채널</th><th>캠페인명</th><th class="num">광고비(만)</th><th></th></tr></thead><tbody>';
+  olds.forEach((c,i)=>{ const done=inNew.indexOf(c.campaign_name)!==-1;
+    h+='<tr data-i="'+i+'"><td>'+esc(c.ad_account_name)+'</td><td>'+esc(c.ad_channel_name)+'</td><td>'+(esc(c.campaign_name)||'<span class="hint">(없음)</span>')+'</td><td class="num">'+man(c.spend)+'</td><td>'+(done?'<span class="hint">신규 등록됨</span>':'<button class="btn sm to-new">→ 신규</button>')+'</td></tr>';
+  });
+  t.innerHTML=h+"</tbody>";
+  t.querySelectorAll(".to-new").forEach(b=>b.addEventListener("click",function(){ const i=+this.closest("tr").dataset.i; promoteToNew(olds[i].campaign_name); }));
+}
+
 function renderTable(){
   const t=document.getElementById("maptbl");
   const counts={}; rows.forEach(r=>counts[r.campaign_id]=(counts[r.campaign_id]||0)+1);
@@ -145,7 +177,7 @@ function renderTable(){
       <td><select class="f fld" data-k="match_type" style="max-width:110px">${MT.map(x=>`<option ${x===r.match_type?"selected":""}>${x}</option>`).join("")}</select></td>
       <td><select class="f fld" data-k="status" style="max-width:110px">${ST.map(x=>`<option ${x===r.status?"selected":""}>${x}</option>`).join("")}</select></td>
       <td><input class="f fld" data-k="note" value="${esc(r.note)}" style="max-width:140px"></td>
-      <td><button class="btn sm del">삭제</button></td></tr>`;
+      <td><button class="btn sm clone">복제</button> <button class="btn sm del">삭제</button></td></tr>`;
   });
   t.innerHTML=h+"</tbody>";
   t.querySelectorAll(".fld").forEach(el=>el.addEventListener("change",function(){
@@ -153,6 +185,10 @@ function renderTable(){
   }));
   t.querySelectorAll(".del").forEach(btn=>btn.addEventListener("click",function(){
     const i=+this.closest("tr").dataset.i; rows.splice(i,1); renderTable();
+  }));
+  t.querySelectorAll(".clone").forEach(btn=>btn.addEventListener("click",function(){
+    const i=+this.closest("tr").dataset.i; const c=Object.assign({},rows[i]); c.campaign_id=""; rows.splice(i+1,0,c); renderTable();
+    flash("행 복제됨 — campaign_id를 지정하세요.");
   }));
 }
 
@@ -170,7 +206,8 @@ async function loadAll(){
   CAMP=mp.campaigns||[]; rows=(mp.campaign_map||[]).map(r=>({campaign_id:r.campaign_id,ad_account_name:r.ad_account_name||"",ad_channel_name:r.ad_channel_name||"",campaign_name:r.campaign_name||"",adset_name:r.adset_name||"",keyword:r.keyword||"",match_type:r.match_type||"exact",status:r.status||"confirmed",note:r.note||""}));
   try{ const um=await fetch(API+"/unmapped?month="+encodeURIComponent(cur)).then(r=>r.json()); unmapped=(um&&um.items)||[]; }catch(e){ unmapped=[]; }
   banner(unmapped.length?`미매핑 <b>${unmapped.length}건</b> · 광고비 합계 <b>${man(unmapped.reduce((s,x)=>s+x.spend,0))}만</b> — 아래에서 매핑 후 저장·재매핑하세요.`:"미매핑 없음. 매핑표만 점검하셔도 됩니다.", unmapped.length?"warn":"ok");
-  renderUnmapped(); renderTable();
+  try{ const ac=await fetch(API+"/adcampaigns?month="+encodeURIComponent(cur)).then(r=>r.json()); adcams=(ac&&ac.items)||[]; }catch(e){ adcams=[]; }
+  renderUnmapped(); renderOld(); renderTable();
 }
 
 async function doSave(){

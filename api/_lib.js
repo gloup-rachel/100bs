@@ -154,6 +154,10 @@ function resolveCampaignId(ad, mapRows) {
   if (hit) return hit.campaign_id;
   hit = scoped.find((m) => m.match_type === 'exact' && m.campaign_name === camp);
   if (hit) return hit.campaign_id;
+  // campaign_list: keyword 에 '|' 로 구분된 캠페인명 목록 중 정확히 일치 (신규 버킷 다수 수용)
+  hit = scoped.find((m) => m.match_type === 'campaign_list' && m.keyword && camp
+    && m.keyword.split('|').map((s) => s.trim()).filter(Boolean).indexOf(camp) !== -1);
+  if (hit) return hit.campaign_id;
   hit = scoped.find((m) => m.match_type === 'campaign_in' && m.campaign_name && camp && camp.indexOf(m.campaign_name) !== -1);
   if (hit) return hit.campaign_id;
   hit = scoped.find((m) => m.match_type === 'fallback');
