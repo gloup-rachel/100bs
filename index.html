@@ -8,6 +8,21 @@
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
   <link rel="stylesheet" href="preset-system.css">
+  <style>
+    /* 하위 카테고리(서브 모듈) — 카드 안에 목록으로 렌더 */
+    .ps-subs{display:flex;flex-direction:column;gap:.35rem;margin:.75rem 0 .25rem}
+    .ps-sub{display:flex;align-items:flex-start;gap:.6rem;padding:.55rem .65rem;border-radius:.6rem;
+      border:1px solid rgba(128,128,128,.18);background:rgba(128,128,128,.05);text-align:left}
+    .ps-sub.is-live{cursor:pointer}
+    .ps-sub.is-live:hover{border-color:currentColor;opacity:.92}
+    .ps-sub.is-soon{opacity:.55}
+    .ps-sub svg{width:16px;height:16px;flex:0 0 auto;margin-top:.15rem}
+    .ps-sub-txt{flex:1 1 auto;min-width:0}
+    .ps-sub-title{font-size:.82rem;font-weight:600;line-height:1.3}
+    .ps-sub-desc{font-size:.72rem;opacity:.65;line-height:1.35;margin-top:.1rem}
+    .ps-sub-tag{font-size:.65rem;opacity:.6;flex:0 0 auto;margin-top:.2rem}
+    .ps-nav-item.sub{padding-left:2.1rem;font-size:.8rem;opacity:.85}
+  </style>
 </head>
 <body>
 
@@ -70,14 +85,57 @@ const SYSTEM = {
   ],
   modules: [
     {
-      icon: 'message',
-      title: 'CRM 자동화 OS',
-      cat: 'admin',
-      desc: '상품 선정부터 카카오톡 발송까지 주간 CRM 파이프라인을 관리해요. 날씨·트렌드 기반으로 발송 상품을 추천합니다.',
-      features: ['날씨 소구 추천', '트렌드 서치', '우선순위 분석', '메시지 생성'],
+      icon: 'trending',
+      title: '미디어 믹스',
+      cat: 'dashboard',
+      desc: '월 목표 KPI, 매체별 예산, 캠페인 편성을 한눈에. 자사몰·네이버 채널 믹스와 요일 배분까지 봅니다.',
+      features: ['목표 KPI', '매체별 예산', '세부 편성표', '요일 배분'],
       status: 'live',
-      href: 'crm-os.html',
-      steps: ['done', 'active', '', '', '', '', ''],
+      href: '/media-mix',
+    },
+    {
+      icon: 'activity',
+      title: 'KPI 대시보드',
+      cat: 'dashboard',
+      desc: '미디어믹스 plan 대비 실적을 매일 추적해요. 달성률·페이스, 일자별 캘린더, 매체별 달성률과 미매핑 경고까지 봅니다.',
+      features: ['달성률·페이스', '일자별 캘린더', '매체별 달성률', '미매핑 경고'],
+      status: 'live',
+      href: '/kpi',
+    },
+    {
+      icon: 'doc',
+      title: '운영 리포트',
+      cat: 'dashboard',
+      desc: '월간 운영 리포트를 봅니다. 미디어믹스 근거와 프로모션 운영안, ROAS 산정 배경을 정리해요.',
+      features: ['월간 리포트', 'ROAS 근거', '프로모션 운영안'],
+      status: 'live',
+      href: '/report',
+    },
+    {
+      icon: 'list',
+      title: '광고 매핑 체크',
+      cat: 'admin',
+      desc: '라플라스 캠페인이 플랜 캠페인에 제대로 매핑됐는지 점검하고, 미매핑 캠페인을 바로 배정·재매핑합니다.',
+      features: ['미매핑 조회', '플랜 배정', '매핑표 편집', '재매핑 반영'],
+      status: 'live',
+      href: '/mapping',
+    },
+    {
+      icon: 'doc',
+      title: '플랜 예산 조정',
+      cat: 'admin',
+      desc: '캠페인 교체·예산 재배치를 직접 편집해요. 스토어별 총액은 제로섬으로 고정되고, 교체 캠페인은 대체됨으로 표기됩니다.',
+      features: ['예산 편집', '총액 잠금', '캠페인 추가', '대체 처리'],
+      status: 'live',
+      href: '/plan-edit',
+    },
+    {
+      icon: 'trending',
+      title: 'ROI 시뮬레이션',
+      cat: 'dashboard',
+      desc: '광고비 대비 예상 매출과 ROAS, 손익을 시뮬레이션해요. 채널별 예산 배분안도 함께 제안합니다.',
+      features: ['ROAS 예측', '예산 최적화', '손익 시뮬레이션', '목표 역산'],
+      status: 'soon',
     },
     {
       icon: 'package',
@@ -100,39 +158,50 @@ const SYSTEM = {
       external: true,
     },
     {
-      icon: 'trending',
-      title: '미디어 믹스 · KPI',
-      cat: 'dashboard',
-      desc: '요일별 광고비 구성과 데일리 예산·매출 KPI를 한눈에. 자사몰·스마트스토어 채널 믹스와 요일 지수 기반 배분 진단까지 봅니다.',
-      features: ['요일별 광고비 구성', '채널×요일 편성표', '데일리 KPI 캘린더', '배분 진단'],
-      status: 'live',
-      href: '/media-mix/2026-10',
-    },
-    {
-      icon: 'trending',
-      title: 'ROI 시뮬레이션',
-      cat: 'dashboard',
-      desc: '광고비 대비 예상 매출과 ROAS, 손익을 시뮬레이션해요. 채널별 예산 배분안도 함께 제안합니다.',
-      features: ['ROAS 예측', '예산 최적화', '손익 시뮬레이션', '목표 역산'],
-      status: 'soon',
-    },
-    {
-      icon: 'activity',
-      title: '퍼포먼스 대시보드',
-      cat: 'performance',
-      desc: '주차별 매출과 ROAS 추이, 채널·캠페인 성과를 한눈에 봅니다. 주간 인사이트도 매주 업데이트돼요.',
-      features: ['주차별 ROAS', '채널별 매출', '캠페인 상세', '주간 인사이트'],
-      status: 'live',
-      href: 'https://hayley-create.github.io/100bs/',
-      external: true,
-    },
-    {
       icon: 'sparkle',
       title: '콘텐츠 인사이트',
       cat: 'content',
       desc: '소재별 성과를 분석해 전환을 만드는 비주얼과 카피를 찾습니다. 다음 소재 방향도 제안해요.',
       features: ['소재 성과 분석', '카피 패턴', '크리에이티브 제안', 'A/B 인사이트'],
       status: 'soon',
+    },
+    {
+      icon: 'message',
+      title: 'CRM 자동화 시스템',
+      cat: 'admin',
+      desc: '카톡 CRM 운영에 쓰는 자료와 화면을 한곳에 모았어요. 상품 소구점부터 편성, 발송 결과까지 여기서 봅니다.',
+      features: ['소구점 라이브러리', '상품 데이터 허브', '편성과 발송 결과'],
+      status: 'live',
+      // 하위 카테고리 — 여기에 추가하면 카드와 사이드바에 자동으로 붙습니다
+      subs: [
+        {
+          icon: 'search',
+          title: '소구점 라이브러리',
+          desc: '상품 번호나 이름으로 소구점, 구성, 금지 사항을 찾습니다',
+          status: 'live',
+          href: '/products',
+        },
+        {
+          icon: 'list',
+          title: 'CRM 데이터 허브',
+          desc: '상품마스터, 이슈보드, 편성 캘린더, 발송로그',
+          status: 'live',
+          href: 'https://docs.google.com/spreadsheets/d/13Oq-y8Myhe11K33TUqHwp4T0eXkLw8kAA1UpluzGrdA/edit',
+          external: true,
+        },
+        {
+          icon: 'sparkle',
+          title: '편성 추천',
+          desc: '성과와 재고를 보고 다음 발송 상품을 제안합니다',
+          status: 'soon',
+        },
+        {
+          icon: 'trending',
+          title: '발송 결과 분석',
+          desc: 'CTR, 클릭당 구매, 1천건당 매출 추이',
+          status: 'soon',
+        },
+      ],
     },
   ],
   // 검색되는 자료(KB). 채우면 KB 카테고리 칩과 검색 결과에 자동 노출됨.
@@ -179,9 +248,34 @@ function setCat(key) {
   update();
 }
 
+function subRow(mi, si) {
+  const sb = SYSTEM.modules[mi].subs[si];
+  const live = sb.status === 'live' && sb.href;
+  const cls = live ? 'is-live' : 'is-soon';
+  const attr = live ? `onclick="openSub(${mi},${si});event.stopPropagation();"` : '';
+  const tag = live ? '열기' : '준비 중';
+  return `
+      <div class="ps-sub ${cls}" ${attr}>
+        ${svg(sb.icon || 'doc')}
+        <span class="ps-sub-txt">
+          <span class="ps-sub-title">${esc(sb.title)}</span>
+          ${sb.desc ? `<span class="ps-sub-desc">${esc(sb.desc)}</span>` : ''}
+        </span>
+        <span class="ps-sub-tag">${tag}</span>
+      </div>`;
+}
+function openSub(mi, si) {
+  const sb = (SYSTEM.modules[mi].subs || [])[si];
+  if (!sb || sb.status !== 'live' || !sb.href) return;
+  if (window.innerWidth < 900) closeNav();
+  if (sb.external) window.open(sb.href, '_blank', 'noopener'); else location.href = sb.href;
+}
+
 function moduleCard(m) {
   const live = m.status === 'live';
-  const clickable = live && m.href;
+  const mi = SYSTEM.modules.indexOf(m);
+  const hasSubs = Array.isArray(m.subs) && m.subs.length > 0;
+  const clickable = live && m.href && !hasSubs;
   const openAttr = clickable
     ? (m.external
         ? `onclick="window.open('${m.href}','_blank','noopener')"`
@@ -197,9 +291,16 @@ function moduleCard(m) {
         `<span class="ps-step ${s}"></span>`).join('')}</div>`
     : '';
 
-  const action = live
-    ? `<span class="ps-action">열기 ${svg('arrow')}</span>`
-    : `<span class="ps-action disabled">${svg('lock')} 준비 중</span>`;
+  const subs = hasSubs
+    ? `<div class="ps-subs">${m.subs.map((_, si) => subRow(mi, si)).join('')}</div>`
+    : '';
+
+  const liveSubs = hasSubs ? m.subs.filter(x => x.status === 'live').length : 0;
+  const action = hasSubs
+    ? `<span class="ps-action disabled">하위 ${m.subs.length}개 · 이용 가능 ${liveSubs}개</span>`
+    : (live
+        ? `<span class="ps-action">열기 ${svg('arrow')}</span>`
+        : `<span class="ps-action disabled">${svg('lock')} 준비 중</span>`);
 
   return `
     <article class="ps-card ${live ? 'is-live' : 'is-soon'}" ${openAttr}>
@@ -209,6 +310,7 @@ function moduleCard(m) {
       <h3 class="ps-card-title">${esc(m.title)}</h3>
       <p class="ps-card-desc">${esc(m.desc)}</p>
       ${features}
+      ${subs}
       ${steps}
       <div class="ps-card-foot">${action}</div>
     </article>`;
@@ -239,9 +341,10 @@ function update() {
   const matchQ = t => !query || t.toLowerCase().includes(query);
 
   // 모듈: 카테고리 일치(전체거나 같은 cat) + 검색어 일치. 'kb' 선택 시 모듈 없음
+  const subText = m => (m.subs || []).map(s => s.title + ' ' + (s.desc || '')).join(' ');
   const mods = (cat === 'kb') ? [] : ordered().filter(m =>
     (cat === 'all' || m.cat === cat) &&
-    matchQ(m.title + ' ' + m.desc + ' ' + m.features.join(' ')));
+    matchQ(m.title + ' ' + m.desc + ' ' + m.features.join(' ') + ' ' + subText(m)));
 
   // KB: 'kb' 카테고리이거나, 전체+검색 중일 때 노출
   const kbSource = (cat === 'kb' || (cat === 'all' && query))
@@ -276,10 +379,19 @@ function sidebarHTML() {
     } else {
       s.modules.forEach((m, i) => {
         if (m.cat !== c.key) return;
-        const live = m.status === 'live' && m.href;
+        const hasSubs = Array.isArray(m.subs) && m.subs.length > 0;
+        const live = m.status === 'live' && m.href && !hasSubs;
         const attr = live ? `onclick="openModuleNav(${i})"` : '';
         const soon = m.status !== 'live' ? `<span class="soon">예정</span>` : '';
         h += `<div class="ps-nav-item" ${attr}>${svg(m.icon)}${esc(m.title)}${soon}</div>`;
+        if (hasSubs) {
+          m.subs.forEach((sb, si) => {
+            const sLive = sb.status === 'live' && sb.href;
+            const sAttr = sLive ? `onclick="openSub(${i},${si})"` : '';
+            const sSoon = sLive ? '' : `<span class="soon">예정</span>`;
+            h += `<div class="ps-nav-item sub" ${sAttr}>${svg(sb.icon || 'doc')}${esc(sb.title)}${sSoon}</div>`;
+          });
+        }
       });
     }
   });

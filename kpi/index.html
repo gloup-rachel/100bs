@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>백년밥상 미디어믹스</title>
+<title>백년밥상 KPI 대시보드</title>
 <script src="/mm-gate.js"></script>
 <script>
-/* 최신 월로 리다이렉트 — /api/mm/months 결과 기준 (월 추가 시 코드 수정 불필요) */
+/* 최신 월 KPI로 리다이렉트 (/api/mm/months 기준) */
 (async function () {
   try {
     const r = await fetch('/api/mm/months').then((r) => r.json());
     const ms = ((r && r.months) || []).slice().sort().reverse();
-    if (ms.length) { location.replace('/media-mix/' + ms[0]); return; }
+    if (ms.length) { location.replace('/kpi/' + ms[0]); return; }
   } catch (e) { /* noop */ }
   document.getElementById('msg').textContent = '등록된 월이 없습니다. 시드 적재 후 새로고침하세요.';
 })();
