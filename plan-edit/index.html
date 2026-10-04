@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>백년밥상 플랜 예산 조정</title>
+<script src="/mm-gate.js"></script>
+<script>
+(async function () {
+  try {
+    const r = await fetch('/api/mm/months').then((r) => r.json());
+    const ms = ((r && r.months) || []).slice().sort().reverse();
+    if (ms.length) { location.replace('/plan-edit/' + ms[0]); return; }
+  } catch (e) { /* noop */ }
+  document.getElementById('msg').textContent = '등록된 월이 없습니다.';
+})();
+</script>
+</head>
+<body style="font-family:system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;padding:2rem;color:#52525b">
+<p id="msg">최신 월로 이동 중…</p>
+</body>
+</html>

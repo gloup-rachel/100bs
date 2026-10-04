@@ -42,6 +42,23 @@ module.exports = async (req, res) => {
         'bb_mm_plans',
         `month=eq.${encodeURIComponent(month)}&select=month,version,payload`
       );
+      // 스토어별 예산 총액 잠금 (제로섬 강제) — 바뀌면 force 없이는 거부
+      if (prev.length && !body.force) {
+        const sums = (pl) => {
+          const o = {};
+          ((pl && pl.campaigns) || []).forEach((c) => { o[c.store] = (o[c.store] || 0) + Number(c.budget || 0); });
+          return o;
+        };
+        const a = sums(prev[0].payload), b = sums(body.payload);
+        const deltas = {};
+        for (const s of new Set([...Object.keys(a), ...Object.keys(b)])) {
+          const d = (b[s] || 0) - (a[s] || 0);
+          if (d !== 0) deltas[s] = d;
+        }
+        if (Object.keys(deltas).length) {
+          return json(res, 409, { error: 'budget_total_changed', deltas, hint: '스토어별 예산 총액이 직전과 다릅니다. 제로섬으로 맞추거나 force:true 로 저장하세요.' });
+        }
+      }
       if (prev.length) {
         await sbInsert('bb_mm_plan_history', {
           month: prev[0].month, version: prev[0].version, payload: prev[0].payload,

@@ -61,7 +61,7 @@ a.back{color:var(--ink2);font-size:13px;text-decoration:none}
 
   <section class="sec">
     <h2>(기존) 단품에 묶인 캠페인 <span id="oldcount" class="chip n"></span></h2>
-    <div class="m">현재 (기존)단품(SHOP_OLD)으로 집계되는 라플라스 캠페인. <b>"→ 신규"</b>를 누르면 (신규)단품(SHOP_NEW) 리스트에 복사·추가됩니다. 저장 + 재매핑하면 신규 버킷으로 이동해요.</div>
+    <div class="m">현재 (기존)단품(SHOP_OLD)으로 집계되는 라플라스 캠페인. 오른쪽에서 <b>슬롯을 고르고 "배정"</b>하면 해당 플랜 캠페인 리스트(campaign_list)에 복사·추가됩니다(기본값 신규). 저장 + 재매핑하면 그 슬롯으로 이동해요.</div>
     <div class="tbl-wrap"><table id="oldtbl"></table></div>
   </section>
 
@@ -121,44 +121,41 @@ function renderUnmapped(){
   t.querySelectorAll(".um-assign").forEach(btn=>btn.addEventListener("click",function(){
     const tr=this.closest("tr"); const i=+tr.dataset.i; const cid=tr.querySelector(".um-sel").value;
     if(!cid){ flash("플랜 캠페인을 먼저 선택하세요.",true); return; }
-    assign(unmapped[i], cid);
+    assignToSlot(unmapped[i], cid);
   }));
 }
 
-function assign(u, cid){
-  // 해당 플랜 id 행이 있으면 갱신(덮어쓰기), 없으면 추가 — exact 매칭
+// 라플라스 캠페인을 플랜 슬롯에 campaign_list로 배정(여러 개 → 1 슬롯). 기존 exact 규칙은 리스트로 보존.
+function assignToSlot(item, cid){
+  if(!cid){ flash("슬롯(플랜 캠페인)을 선택하세요.",true); return; }
+  if(!item.campaign_name){ flash("캠페인명이 없어 자동 배정 불가 — 매핑표에서 직접 지정하세요.",true); return; }
   let row=rows.find(r=>r.campaign_id===cid);
-  const data={campaign_id:cid, ad_account_name:u.ad_account_name, ad_channel_name:u.ad_channel_name, campaign_name:u.campaign_name, adset_name:u.adset_name||"", keyword:"", match_type:"exact", status:"confirmed", note:"매핑 체크로 추가"};
-  if(row){ Object.assign(row,data); flash(cid+" 규칙을 이 캠페인으로 덮어썼습니다. (여러 개면 keyword_in 권장)"); }
-  else { rows.push(data); flash(cid+" 매핑 추가됨. 저장 후 재매핑하세요."); }
-  renderTable();
-  document.getElementById("maptbl").scrollIntoView({behavior:"smooth",block:"center"});
+  if(!row){ row={campaign_id:cid, ad_account_name:item.ad_account_name||null, ad_channel_name:item.ad_channel_name||null, campaign_name:null, adset_name:null, keyword:'', match_type:'campaign_list', status:'confirmed', note:'매핑 체크로 배정'}; rows.push(row); }
+  if(!row.ad_account_name) row.ad_account_name=item.ad_account_name||null;
+  if(!row.ad_channel_name) row.ad_channel_name=item.ad_channel_name||null;
+  let list=(row.keyword||'').split('|').map(s=>s.trim()).filter(Boolean);
+  // exact→campaign_list 전환 시 기존 campaign_name 보존
+  if(row.match_type==='exact' && row.campaign_name && list.indexOf(row.campaign_name)===-1) list.push(row.campaign_name);
+  row.match_type='campaign_list'; row.campaign_name=null;
+  if(list.indexOf(item.campaign_name)!==-1){ flash("이미 "+cid+"에 있음: "+item.campaign_name); return; }
+  list.push(item.campaign_name); row.keyword=list.join('|');
+  flash(cid+"에 배정: "+item.campaign_name+" — 저장 + 재매핑하세요.");
+  renderUnmapped(); renderOld(); renderTable();
 }
 
-function newList(){ const r=rows.find(x=>x.campaign_id==='SHOP_NEW'); return r?((r.keyword||'').split('|').map(s=>s.trim()).filter(Boolean)):[]; }
-function promoteToNew(name){
-  if(!name){ flash("캠페인명이 없습니다.",true); return; }
-  let row=rows.find(r=>r.campaign_id==='SHOP_NEW');
-  if(!row){ row={campaign_id:'SHOP_NEW',ad_account_name:'pym12',ad_channel_name:'NAVER_SEARCHAD',campaign_name:null,adset_name:null,keyword:'',match_type:'campaign_list',status:'confirmed',note:'신규 단품 리스트'}; rows.push(row); }
-  row.match_type='campaign_list';
-  const list=(row.keyword||'').split('|').map(s=>s.trim()).filter(Boolean);
-  if(list.indexOf(name)!==-1){ flash("이미 신규에 있음: "+name); return; }
-  list.push(name); row.keyword=list.join('|');
-  flash("신규(SHOP_NEW)에 추가: "+name+" — 저장 + 재매핑하세요.");
-  renderTable(); renderOld();
-}
 function renderOld(){
   const t=document.getElementById("oldtbl"); if(!t) return;
-  const inNew=newList();
   const olds=adcams.filter(c=>c.campaign_id==='SHOP_OLD');
   const el=document.getElementById("oldcount"); if(el) el.textContent=olds.length+"개";
   if(!olds.length){ t.innerHTML='<tbody><tr><td style="color:var(--ink3)">SHOP_OLD로 집계된 캠페인이 아직 없습니다.</td></tr></tbody>'; return; }
-  let h='<thead><tr><th>계정</th><th>채널</th><th>캠페인명</th><th class="num">광고비(만)</th><th></th></tr></thead><tbody>';
-  olds.forEach((c,i)=>{ const done=inNew.indexOf(c.campaign_name)!==-1;
-    h+='<tr data-i="'+i+'"><td>'+esc(c.ad_account_name)+'</td><td>'+esc(c.ad_channel_name)+'</td><td>'+(esc(c.campaign_name)||'<span class="hint">(없음)</span>')+'</td><td class="num">'+man(c.spend)+'</td><td>'+(done?'<span class="hint">신규 등록됨</span>':'<button class="btn sm to-new">→ 신규</button>')+'</td></tr>';
+  let h='<thead><tr><th>계정</th><th>채널</th><th>캠페인명</th><th class="num">광고비(만)</th><th>→ 슬롯</th><th></th></tr></thead><tbody>';
+  olds.forEach((c,i)=>{
+    h+='<tr data-i="'+i+'"><td>'+esc(c.ad_account_name)+'</td><td>'+esc(c.ad_channel_name)+'</td><td>'+(esc(c.campaign_name)||'<span class="hint">(없음)</span>')+'</td><td class="num">'+man(c.spend)+'</td>'
+      +'<td><select class="f old-sel">'+campOptions(c.store,"SHOP_NEW")+'</select></td>'
+      +'<td><button class="btn sm old-assign">배정</button></td></tr>';
   });
   t.innerHTML=h+"</tbody>";
-  t.querySelectorAll(".to-new").forEach(b=>b.addEventListener("click",function(){ const i=+this.closest("tr").dataset.i; promoteToNew(olds[i].campaign_name); }));
+  t.querySelectorAll(".old-assign").forEach(b=>b.addEventListener("click",function(){ const tr=this.closest("tr"); const i=+tr.dataset.i; assignToSlot(olds[i], tr.querySelector(".old-sel").value); }));
 }
 
 function renderTable(){
