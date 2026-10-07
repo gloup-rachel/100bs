@@ -160,9 +160,9 @@ function active(P,st){return P.campaigns.filter(c=>c.store===st&&!c.conditional)
 function kpi(P,st){
   const cs=active(P,st),S=P.stores[st],B=sum(cs,"budget"),R=sum(cs,"target_revenue"),I=sum(cs,"target_impressions"),C=sum(cs,"target_clicks"),V=sum(cs,"target_conversions");
   const el=document.createElement("div");el.className="card kpi";
-  el.innerHTML=`<div class="kpi-top"><span class="store"><i style="background:${STORE[st].color}"></i>${STORE[st].label}</span><span class="tag">${st==="naver"?"목표 확정":"목표 = 예상치 (추정)"}</span></div>
+  el.innerHTML=`<div class="kpi-top"><span class="store"><i style="background:${STORE[st].color}"></i>${STORE[st].label}</span><span class="tag">${S.target_sales!==S.expected_sales?"목표 확정":"목표 = 예상치 (추정)"}</span></div>
   <div class="row2"><div><div class="lbl" style="font-size:12px;color:var(--ink2)">목표 매출</div><div class="big num">${eok(S.target_sales)}</div></div>
-  <div class="exp num">예상 ${eok(S.expected_sales)} (추정)<br>일평균 목표 ${won(S.target_sales/P.days.length)}</div></div>
+  <div class="exp num">예상 ${eok(S.expected_sales)} (추정)<br>일평균 목표 ${won(S.target_sales/P.days.length)}</div></div>${S.scenarios?`<div class="small" style="margin-top:6px">시나리오 | ${(S.scenario_labels||{conservative:"보수",base:"기준",optimistic:"낙관"}).conservative} ${eok(S.scenarios.conservative)} | ${(S.scenario_labels||{conservative:"보수",base:"기준",optimistic:"낙관"}).base} ${eok(S.scenarios.base)} | ${(S.scenario_labels||{conservative:"보수",base:"기준",optimistic:"낙관"}).optimistic} ${eok(S.scenarios.optimistic)}</div>`:""}${S.note?`<div class="small">${S.note}</div>`:""}
   <div class="ratios"><div class="ratio"><div class="k">매출 ÷ 광고비 (MER)</div><div class="v num">${pct(S.target_sales/B,0)}</div></div>
   <div class="ratio"><div class="k">매체 귀속 목표 ROAS</div><div class="v num">${pct(R/B,0)}</div></div>
   <div class="ratio"><div class="k">광고비</div><div class="v num">${man(B)}만</div></div></div>
@@ -206,7 +206,7 @@ function mix(P){
         <td class="l">${c.name}${c.replaced?'<span class="pill" style="background:var(--warn-bg);color:var(--warn-ink)">대체됨</span>':""}${c.conditional?'<span class="pill">조건부</span>':""}<span class="note">${c.note}</span></td><td class="l">${dateLabel(c)}<span class="note">${c.schedule.label}</span></td><td class="l">${wk}</td><td class="num">${c.schedule.days}일</td><td class="num">${dayB}</td><td class="num">${n0(c.budget)}</td><td class="num">${c.conditional?"-":pct(c.budget/B,1)}</td><td class="num">${n0(c.target_impressions)}</td><td class="num">${n0(c.target_clicks)}</td><td class="num">${n1(c.target_conversions)}</td><td class="num">${n0(c.budget/c.target_clicks)}</td><td class="num">${pct(c.target_clicks/c.target_impressions)}</td><td class="num">${n0(c.budget/c.target_conversions)}</td><td class="num roasv">${pct(c.target_roas,0)}</td></tr>`;first=false;});});
   });
   document.getElementById("mix").innerHTML=h+"</tbody>";
-  document.getElementById("foot").innerHTML=`<div><b>일예산</b> 월 예산 ÷ 운영일수. 검색광고는 요일 지수로 가중 배분하므로 평균값입니다. 조건부 캠페인은 비중과 합계에서 제외.</div><div><b>목표 ROAS</b> 9월 실측 기반 역산값 (추정 포함). 산정 근거는 월간 리포트에 있습니다. plan ${P.version}, 확정 ${P.approved}.</div>`;
+  document.getElementById("foot").innerHTML=`<div><b>일예산</b> 월 예산 ÷ 운영일수. 검색광고는 요일 지수로 가중 배분하므로 평균값입니다. 조건부 캠페인은 비중과 합계에서 제외.</div><div><b>목표 ROAS</b> 9월 실측 기반 역산값 (추정 포함). 산정 근거는 월간 리포트에 있습니다. plan ${P.version}, ${P.approved?"확정 "+P.approved:"승인 대기"}.${(P.changelog||[]).map(x=>` | ${x.version} (${x.date}) ${x.summary}`).join("")}</div>`;
 }
 function render(){
   const P=PLANS[cur];const mo=Number(cur.slice(5));
