@@ -132,11 +132,22 @@ function storeOfAccount(accName) {
   return null; // 미분류
 }
 
-/* 매핑 (HANDOFF §5)
- * 우선순위: keyword_in > adset_in > exact(campaign+adset) > exact(campaign) > fallback
- * budget_only 는 매핑 대상이 아님. 미매칭은 'unmapped'.
- */
-function resolveCampaignId(ad, mapRows) {
+/* 코드 추출: 이름 안의 [CODE] 토큰(대문자/숫자+하이픈). 한글 대괄호([상시] 등)는 미매칭.
+ * 맨 앞 우선, 없으면 문자열 내 첫 코드 토큰. */
+function extractCode(s) {
+  const str = String(s == null ? '' : s);
+  const m = str.match(/\[([A-Z0-9][A-Z0-9-]*)\]/);
+  return m ? m[1] : null;
+}
+
+/* 매핑 v2 (매칭 체계 v2 — naming_and_matching_v2.md)
+ * 1) 코드 매칭 [주]: 광고그룹명 코드 우선 → 캠페인명 코드 → map(match_type='code', keyword=코드) 1:1
+ * 2) 예외(exact override): 코드와 다르게 보낼 특정 캠페인만
+ * 3) 레거시 호환(전환기): keyword_in/adset_in/campaign_list/campaign_in/fallback — 코드맵 반영 후 자연 비활성
+ * 4) 미매칭 → 'unmapped' (= 코드 누락/오타. 조용히 안 틀림)
+ * budget_only 는 매핑 대상이 아님.
+ * 반환은 campaign_id 문자열(기존 시그니처 유지). 이유까지 필요하면 resolveMatch 사용. */
+function resolveMatch(ad, mapRows) {
   const acc = String(ad.ad_account_name || '');
   const chan = String(ad.ad_channel_name || '');
   const camp = String(ad.campaign_name || '');
@@ -144,30 +155,45 @@ function resolveCampaignId(ad, mapRows) {
   const kw = String(ad.keyword || '');
   const sameAcct = (m) => !m.ad_account_name || m.ad_account_name === acc;
   const sameChan = (m) => !m.ad_channel_name || m.ad_channel_name === chan;
-  const scoped = mapRows.filter((m) => m.status !== 'budget_only' && sameAcct(m) && sameChan(m));
+  const live = mapRows.filter((m) => m.status !== 'budget_only');
 
-  let hit = scoped.find((m) => m.match_type === 'keyword_in' && m.keyword && kw && kw.indexOf(m.keyword) !== -1);
-  if (hit) return hit.campaign_id;
-  hit = scoped.find((m) => m.match_type === 'adset_in' && m.adset_name && adset && adset.indexOf(m.adset_name) !== -1);
-  if (hit) return hit.campaign_id;
-  hit = scoped.find((m) => m.match_type === 'exact' && m.campaign_name === camp && (m.adset_name || '') !== '' && (m.adset_name || '') === adset);
-  if (hit) return hit.campaign_id;
+  // 1) 코드 매칭 (전역 고유 → 계정·채널 무관)
+  const code = extractCode(adset) || extractCode(camp);
+  if (code) {
+    const hit = live.find((m) => m.match_type === 'code' && m.keyword && m.keyword === code);
+    if (hit) return { campaign_id: hit.campaign_id, reason: `code [${code}]` };
+  }
+
+  const scoped = live.filter((m) => sameAcct(m) && sameChan(m));
+  // 2) 예외(exact override)
+  let hit = scoped.find((m) => m.match_type === 'exact' && m.campaign_name === camp && (m.adset_name || '') !== '' && (m.adset_name || '') === adset);
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'exact(campaign+adset)' };
   hit = scoped.find((m) => m.match_type === 'exact' && m.campaign_name === camp);
-  if (hit) return hit.campaign_id;
-  // campaign_list: keyword 에 '|' 로 구분된 캠페인명 목록 중 정확히 일치 (신규 버킷 다수 수용)
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'exact(campaign)' };
+
+  // 3) 레거시 호환 (전환기)
+  hit = scoped.find((m) => m.match_type === 'keyword_in' && m.keyword && kw && kw.indexOf(m.keyword) !== -1);
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'legacy:keyword_in' };
+  hit = scoped.find((m) => m.match_type === 'adset_in' && m.adset_name && adset && adset.indexOf(m.adset_name) !== -1);
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'legacy:adset_in' };
   hit = scoped.find((m) => m.match_type === 'campaign_list' && m.keyword && camp
     && m.keyword.split('|').map((s) => s.trim()).filter(Boolean).indexOf(camp) !== -1);
-  if (hit) return hit.campaign_id;
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'legacy:campaign_list' };
   hit = scoped.find((m) => m.match_type === 'campaign_in' && m.campaign_name && camp && camp.indexOf(m.campaign_name) !== -1);
-  if (hit) return hit.campaign_id;
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'legacy:campaign_in' };
   hit = scoped.find((m) => m.match_type === 'fallback');
-  if (hit) return hit.campaign_id;
-  return 'unmapped';
+  if (hit) return { campaign_id: hit.campaign_id, reason: 'legacy:fallback' };
+
+  return { campaign_id: 'unmapped', reason: 'unmapped' };
+}
+
+function resolveCampaignId(ad, mapRows) {
+  return resolveMatch(ad, mapRows).campaign_id;
 }
 
 module.exports = {
   sbSelect, sbUpsert, sbInsert, sbDelete,
   roleOf, gate, ingestOk,
   json, readJson,
-  monthOf, storeOfAccount, resolveCampaignId,
+  monthOf, storeOfAccount, resolveCampaignId, resolveMatch, extractCode,
 };

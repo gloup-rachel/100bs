@@ -67,7 +67,7 @@ a.back{color:var(--ink2);font-size:13px;text-decoration:none}
 
   <section class="sec">
     <h2>매핑표 (편집)</h2>
-    <div class="m">플랜 캠페인 1개당 1행. 여러 라플라스 캠페인을 한 플랜에 묶으려면 매칭=keyword_in/adset_in/fallback 사용. 빨간 테두리는 campaign_id 중복.</div>
+    <div class="m">플랜 캠페인 1개당 1행. <b>매칭=code</b>면 keyword 칸의 코드(예 CBT-NEW-ALL)를 캠페인·광고그룹명 <b>[코드]</b> 토큰과 1:1 대조 — 여러 라플라스 캠페인이 같은 코드면 자동 집계. 코드 없/오타는 미매핑으로 떠요. 빨간 테두리는 campaign_id 중복.</div>
     <div class="tbl-wrap"><table id="maptbl"></table></div>
     <div style="padding:10px 0"><button class="btn sm" id="addrow">+ 행 추가</button></div>
   </section>
@@ -85,7 +85,7 @@ const API="/api/mm";
 function monthFromPath(){const m=(location.pathname.match(/(\d{4}-\d{2})/)||[])[1];return m||null;}
 const man=v=>v==null||!isFinite(v)?"-":Math.round(v/1e4).toLocaleString("ko-KR");
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const MT=["exact","campaign_in","campaign_list","keyword_in","adset_in","fallback","budget_only"];
+const MT=["code","exact","campaign_in","campaign_list","keyword_in","adset_in","fallback","budget_only"];
 const ST=["confirmed","provisional","pending","fallback","budget_only"];
 
 let MONTHS=[], cur=monthFromPath(), CAMP=[], rows=[], unmapped=[], adcams=[];
