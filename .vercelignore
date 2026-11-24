@@ -1,0 +1,15 @@
+# 로컬/문서 전용 (공개 배포 제외)
+docs/
+scripts/
+.env*
+node_modules/
+tracker-work/
+100bs-tracker/
+.git/
+.vercel/
+# 내부 파일 (공개 금지)
+*.xlsx
+*.zip
+[안내] 트래커 Vercel 배포.md
+# 구 CRM 자동화 OS — CRM 자동화 시스템 모듈로 대체 (2026-09-30)
+crm-os.html

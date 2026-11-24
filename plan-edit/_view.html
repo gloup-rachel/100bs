@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>백년밥상 플랜 예산 조정</title>
+<script src="/mm-gate.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--ink:#15171c;--ink2:#4b5060;--ink3:#8a8f9c;--line:#e4e6eb;--line2:#eef0f3;--head:#f6f7f9;--accent:#3b34c7;--nav:#1d9a55;--own:#d4652c;--warn-bg:#fff5de;--warn-ink:#8a5a00;--ok-bg:#e3f4ea;--ok-ink:#1d7a45;--danger:#c0392b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111317;--card:#191c21;--ink:#eceef2;--ink2:#b3b8c4;--ink3:#7d8391;--line:#2a2e36;--line2:#23262d;--head:#1f2228;--accent:#8e88ff;--nav:#4cc783;--own:#f08a52;--warn-bg:#3a2e12;--warn-ink:#f0c870;--ok-bg:#183526;--ok-ink:#4cc783;--danger:#ef6b5e;color-scheme:dark}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo",sans-serif;font-size:14px;line-height:1.5;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding:24px 18px 90px;display:flex;flex-direction:column;gap:18px}
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+h1{font-size:21px;margin:0;font-weight:700}
+header.top p{margin:4px 0 0;color:var(--ink2);font-size:13px}
+a.back{color:var(--ink2);font-size:13px;text-decoration:none}
+.sel{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;background:var(--card);color:var(--ink)}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.locks{display:flex;gap:12px;flex-wrap:wrap}
+.lock{flex:1;min-width:240px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-variant-numeric:tabular-nums}
+.lock .s{font-size:12px;color:var(--ink3)}
+.lock .v{font-size:15px;font-weight:700;margin-top:2px}
+.lock.ok{border-color:var(--ok-ink)}
+.lock.bad{border-color:var(--danger)}
+.lock .d{font-size:12px;font-weight:600}
+.lock.ok .d{color:var(--ok-ink)} .lock.bad .d{color:var(--danger)}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 14px 6px}
+.sec h2{font-size:15px;margin:0 0 10px;display:flex;gap:8px;align-items:center}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:12.8px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap;vertical-align:middle}
+th{background:var(--head);color:var(--ink2);font-weight:600;font-size:12px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.rep td{opacity:.6}
+input.f,select.f{font:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:var(--card);color:var(--ink)}
+input.f:focus,select.f:focus{outline:2px solid var(--accent);outline-offset:1px}
+input.bud{width:110px;text-align:right}
+input.ro{width:66px;text-align:right}
+input.nm{min-width:200px}
+.chip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;font-weight:600}
+.chip.n{background:var(--ok-bg);color:var(--nav)} .chip.o{background:#fbeee6;color:var(--own)}
+.btn{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:8px;padding:7px 12px;background:var(--card);color:var(--ink);cursor:pointer}
+.btn.p{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.btn.sm{font-size:12px;padding:4px 9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;position:sticky;bottom:0;background:var(--bg);padding:12px 0;border-top:1px solid var(--line)}
+.hint{color:var(--ink3);font-size:11.5px}
+.state{font-size:13px;border-radius:10px;padding:10px 14px}
+.state.warn{background:var(--warn-bg);color:var(--warn-ink)} .state.ok{background:var(--ok-bg);color:var(--ok-ink)}
+</style>
+</head><body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>플랜 예산 조정</h1>
+      <p>캠페인 교체·예산 재배치를 직접 편집합니다. <b>스토어별 총액은 고정(제로섬)</b> — 예비비/OFF 예산을 옮겨 쓰세요. <a class="back" id="backlink" href="/kpi">← KPI로</a></p>
+    </div>
+    <label class="tag" for="month">월 <select id="month" class="sel"></select></label>
+  </header>
+
+  <div id="msg"></div>
+  <div class="locks" id="locks"></div>
+
+  <section class="sec">
+    <h2>캠페인 <span class="hint">예산/이름/목표ROAS 편집 · "대체"는 예산 0 + 대체됨 표기(원본 유지) · daily·전환매출 자동 재계산</span></h2>
+    <div class="tbl-wrap"><table id="tbl"></table></div>
+    <div style="padding:10px 0;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm" id="add-naver">+ 네이버 캠페인</button>
+      <button class="btn sm" id="add-own">+ 자사몰 캠페인</button>
+    </div>
+  </section>
+
+  <div class="row-actions">
+    <button class="btn p" id="save">저장</button>
+    <button class="btn" id="reload">새로고침</button>
+    <span id="savemsg" class="hint"></span>
+  </div>
+</div>
+
+<script>
+const API="/api/mm";
+function monthFromPath(){const m=(location.pathname.match(/(\d{4}-\d{2})/)||[])[1];return m||null;}
+const won=v=>v==null||!isFinite(v)?"-":Math.round(v).toLocaleString("ko-KR");
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CH={meta_own:{label:'메타 (자사몰)',store:'own'},meta_cbt:{label:'메타 (CBT)',store:'naver'},naver_shopping:{label:'쇼핑검색',store:'naver'},naver_powerlink:{label:'파워링크',store:'naver'},naver_gfa:{label:'GFA',store:'naver'},naver_brand:{label:'브랜드검색',store:'naver'}};
+
+let MONTHS=[], cur=monthFromPath(), payload=null, camps=[], lock={};
+const sel=document.getElementById("month");
+sel.addEventListener("change",()=>{ location.href="/plan-edit/"+sel.value; });
+document.getElementById("backlink").addEventListener("click",e=>{e.preventDefault();location.href="/kpi/"+cur;});
+
+function storeSum(store){ return camps.filter(c=>c.store===store).reduce((a,c)=>a+(Number(c.budget)||0),0); }
+function flash(t,warn){ const m=document.getElementById("savemsg"); m.textContent=t; m.style.color=warn?"var(--danger)":"var(--ink3)"; }
+function banner(html,cls){ document.getElementById("msg").innerHTML=html?`<div class="state ${cls||'warn'}">${html}</div>`:""; }
+
+function renderLocks(){
+  const box=document.getElementById("locks"); let h="";
+  ["naver","own"].forEach(s=>{
+    const now=storeSum(s), lk=lock[s]||0, d=now-lk, ok=d===0;
+    h+=`<div class="lock ${ok?'ok':'bad'}"><div class="s">${s==="naver"?"네이버":"자사몰"} 고정 총액</div><div class="v">${won(lk)}</div><div class="d">편집 후 ${won(now)} ${ok?"✓ 일치":"✗ "+(d>0?"+":"")+won(d)}</div></div>`;
+  });
+  box.innerHTML=h;
+}
+
+function nextId(){ let mx=0; camps.forEach(c=>{const m=/^c(\d+)$/.exec(c.id); if(m)mx=Math.max(mx,+m[1]);}); return "c"+(mx+1); }
+
+function render(){
+  const order={naver:0,own:1};
+  const sorted=[...camps].sort((a,b)=>(order[a.store]-order[b.store])|| (a.channel<b.channel?-1:1));
+  let h='<thead><tr><th>스토어</th><th>채널</th><th>campaign_id</th><th>이름</th><th class="num">월 예산</th><th class="num">목표ROAS</th><th>대체</th><th>note</th></tr></thead><tbody>';
+  sorted.forEach(c=>{
+    const idx=camps.indexOf(c);
+    const chip=c.store==="naver"?'<span class="chip n">네이버</span>':'<span class="chip o">자사몰</span>';
+    h+=`<tr data-i="${idx}" class="${c.replaced?'rep':''}">
+      <td>${chip}</td>
+      <td>${esc(c.channel_label||c.channel)}</td>
+      <td>${c._new?`<input class="f" style="width:70px" data-k="id" value="${esc(c.id)}">`:esc(c.id)}</td>
+      <td><input class="f nm" data-k="name" value="${esc(c.name)}"></td>
+      <td class="num"><input class="f bud" type="number" data-k="budget" value="${Number(c.budget)||0}"></td>
+      <td class="num"><input class="f ro" type="number" step="0.01" data-k="target_roas" value="${Number(c.target_roas)||0}"></td>
+      <td><input type="checkbox" class="rep-chk" ${c.replaced?"checked":""}></td>
+      <td><input class="f" data-k="note" value="${esc(c.note)}"></td></tr>`;
+  });
+  document.getElementById("tbl").innerHTML=h+"</tbody>";
+  const t=document.getElementById("tbl");
+  t.querySelectorAll(".f").forEach(el=>el.addEventListener("input",function(){
+    const i=+this.closest("tr").dataset.i, k=this.dataset.k;
+    camps[i][k]= (k==="budget"||k==="target_roas")? (parseFloat(this.value)||0) : this.value;
+    if(k==="budget") renderLocks();
+  }));
+  t.querySelectorAll(".rep-chk").forEach(el=>el.addEventListener("change",function(){
+    const i=+this.closest("tr").dataset.i;
+    camps[i].replaced=this.checked;
+    if(this.checked){ camps[i]._prevBudget=camps[i].budget; camps[i].budget=0; if(!/대체/.test(camps[i].note||"")) camps[i].note=(camps[i].note?camps[i].note+" · ":"")+"대체됨"; }
+    else { if(camps[i]._prevBudget!=null) camps[i].budget=camps[i]._prevBudget; }
+    render(); renderLocks();
+  }));
+}
+
+function addCampaign(store){
+  const chs=Object.keys(CH).filter(k=>CH[k].store===store);
+  const ch=chs[0];
+  camps.push({id:nextId(),store,channel:ch,channel_label:CH[ch].label,name:"신규 캠페인",budget:0,budget_base:0,budget_promo:0,conditional:false,target_roas:5,note:"",_new:true,_origBudget:0,_origRoas:5,_origReplaced:false});
+  render(); renderLocks();
+  flash("신규 캠페인 추가 — 채널은 이름/ID로 구분, 예산을 다른 캠페인에서 옮겨 총액 맞추세요.");
+}
+
+// daily_budget 재계산
+function weekdayDist(store,budget){
+  const wi=((payload.stores[store]||{}).weekday_index)||{}, ds=payload.days||[];
+  const S=ds.reduce((a,d)=>a+(Number(wi[d.wd])||1),0)||ds.length||1;
+  const arr=ds.map(d=>Math.round(budget*((Number(wi[d.wd])||1)/S)));
+  if(arr.length) arr[arr.length-1]+=budget-arr.reduce((a,b)=>a+b,0);
+  return arr;
+}
+function scaleDaily(orig,origB,newB){
+  if(!orig||!orig.length||!origB) return null;
+  const arr=orig.map(d=>Math.round(d*newB/origB));
+  arr[arr.length-1]+=newB-arr.reduce((a,b)=>a+b,0);
+  return arr;
+}
+
+async function save(force){
+  // 검증: 스토어 총액
+  const bad=["naver","own"].filter(s=>storeSum(s)!==(lock[s]||0));
+  if(bad.length && !force){
+    flash("총액 불일치: "+bad.map(s=>(s==="naver"?"네이버":"자사몰")).join(", ")+" — 제로섬으로 맞추세요. (그래도 저장하려면 다시 '강제저장')",true);
+    document.getElementById("save").textContent="강제저장(총액변경)"; document.getElementById("save").dataset.force="1";
+    return;
+  }
+  // id 중복/빈값 체크
+  const ids=camps.map(c=>String(c.id||"").trim());
+  if(ids.some(x=>!x)){ flash("campaign_id 빈 값이 있습니다.",true); return; }
+  if(new Set(ids).size!==ids.length){ flash("campaign_id 중복이 있습니다.",true); return; }
+
+  // 파생값 재계산 (변경된 캠페인만)
+  camps.forEach(c=>{
+    const changed=c._new || c.budget!==c._origBudget || c.target_roas!==c._origRoas || !!c.replaced!==!!c._origReplaced;
+    if(!changed) return;
+    if(c.replaced) c.budget=0;
+    c.daily_budget = (Number(c.budget)<=0)? (payload.days||[]).map(()=>0) : (scaleDaily(c._origDaily,c._origBudget,c.budget)||weekdayDist(c.store,c.budget));
+    c.target_revenue=Math.round(Number(c.budget)*(Number(c.target_roas)||0));
+    c.budget_base=Number(c.budget)||0; c.budget_promo=0;
+    if(c._new && !c.schedule){ c.schedule={type:'daily_weighted',label:'매일 (요일 가중)',weekdays:[0,1,2,3,4,5,6],dates:(payload.days||[]).map(d=>d.date),days:(payload.days||[]).length}; c.target_impressions=0;c.target_clicks=0;c.target_conversions=0;c.basis={cpm:0,ctr:0,aov:0}; }
+  });
+  // 정리: 내부 필드 제거
+  const clean=camps.map(c=>{const o=Object.assign({},c); delete o._new;delete o._origDaily;delete o._origBudget;delete o._origRoas;delete o._origReplaced;delete o._prevBudget; if(!o.replaced) delete o.replaced; return o;});
+  const newPayload=Object.assign({},payload,{campaigns:clean});
+  const version=(payload.version||"v?")+"+"+new Date().toISOString().slice(0,16).replace(/[-:T]/g,"");
+
+  flash("저장 중...");
+  const r=await fetch(API+"/plan?month="+encodeURIComponent(cur),{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify({version,approved:payload.approved,payload:newPayload,force:!!force})});
+  const j=await r.json();
+  if(r.status===409){ flash("서버 총액잠금: "+JSON.stringify(j.deltas)+" — '강제저장'으로 다시 누르세요.",true); document.getElementById("save").textContent="강제저장(총액변경)"; document.getElementById("save").dataset.force="1"; return; }
+  if(!r.ok||!j.ok){ flash("저장 실패: "+((j&&j.error)||r.status),true); return; }
+  flash("저장됨 (version "+j.version+"). 매핑 페이지에서 신규 캠페인을 슬롯에 배정 후 재매핑하세요.");
+  document.getElementById("save").textContent="저장"; delete document.getElementById("save").dataset.force;
+  await load();
+}
+
+async function load(){
+  try{ MONTHS=(((await fetch(API+"/months").then(r=>r.json()))||{}).months||[]).slice(); }catch(e){ MONTHS=[]; }
+  if(cur&&!MONTHS.includes(cur)) MONTHS.unshift(cur);
+  MONTHS=[...new Set(MONTHS)].sort().reverse(); if(!cur)cur=MONTHS[0];
+  sel.innerHTML=""; MONTHS.forEach(k=>{const o=document.createElement("option");o.value=k;o.textContent=k.replace("-","년 ")+"월";sel.appendChild(o);}); if(cur)sel.value=cur;
+  if(!cur){ banner("등록된 월이 없습니다."); return; }
+  let pr; try{ pr=await fetch(API+"/plan?month="+encodeURIComponent(cur)).then(r=>r.json()); }catch(e){}
+  if(!pr||pr.error||!pr.payload){ banner("플랜 불러오기 실패: "+((pr&&pr.error)||"")); return; }
+  payload=pr.payload;
+  camps=(payload.campaigns||[]).map(c=>Object.assign({},c,{_origDaily:(c.daily_budget||[]).slice(),_origBudget:Number(c.budget)||0,_origRoas:Number(c.target_roas)||0,_origReplaced:!!c.replaced}));
+  lock={naver:storeSum("naver"),own:storeSum("own")};
+  banner("스토어별 총액이 고정값입니다. 예비비/OFF 예산을 옮겨 <b>편집 후 총액 = 고정 총액(✓)</b> 으로 맞춘 뒤 저장하세요. 매출 목표는 캠페인과 무관해 영향 없습니다.","ok");
+  renderLocks(); render();
+  document.getElementById("save").textContent="저장"; delete document.getElementById("save").dataset.force;
+}
+
+document.getElementById("save").addEventListener("click",function(){ save(this.dataset.force==="1"); });
+document.getElementById("reload").addEventListener("click",load);
+document.getElementById("add-naver").addEventListener("click",()=>addCampaign("naver"));
+document.getElementById("add-own").addEventListener("click",()=>addCampaign("own"));
+load();
+</script>
+</body></html>

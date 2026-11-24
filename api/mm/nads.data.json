@@ -1,0 +1,1113 @@
+{
+ "updated_at": "2026-11-23",
+ "sheet": "백년밥상)쇼핑검색 효율관리 시트",
+ "period": {
+  "start": "2026-10-08",
+  "end": "2026-11-22",
+  "days": 46
+ },
+ "target_multiple": 2.5,
+ "rule": "실ROAS=보고ROAS×환산계수 · BEP ROAS=1/마진율 · 목표 ROAS=2.5/마진율 · 최소 판정 클릭 50",
+ "media": [
+  {
+   "key": "ss",
+   "name": "쇼핑검색",
+   "period": "10.8~11.22",
+   "cost": 7059192,
+   "conv": 2853,
+   "reportRoas": "1288%",
+   "contribMargin": 14329582,
+   "multiple": 2.03,
+   "profit": 7270390,
+   "counts": {
+    "up": 5,
+    "watch": 4,
+    "down": 3,
+    "off": 3,
+    "keep": 2,
+    "sample": 9
+   }
+  },
+  {
+   "key": "pl",
+   "name": "파워링크",
+   "period": "10.8~11.22",
+   "cost": 1249037,
+   "conv": 1299,
+   "reportRoas": "4424%",
+   "contribMargin": 8828644,
+   "multiple": 7.07,
+   "profit": 7579607,
+   "counts": {
+    "up": 1,
+    "off": 2,
+    "down": 1,
+    "sample": 1
+   }
+  },
+  {
+   "key": "gfa",
+   "name": "GFA",
+   "period": "10.24~11.22",
+   "cost": 7165753,
+   "conv": 1406,
+   "reportRoas": "657%",
+   "contribMargin": 7767673,
+   "multiple": 1.08,
+   "profit": 601920,
+   "counts": {
+    "watch": 1,
+    "down": 2,
+    "excluded": 1
+   }
+  }
+ ],
+ "rows": [
+  {
+   "media": "ss",
+   "campaign": "[SS-LOW]저단가운영",
+   "group": "저단가운영_광고그룹#1",
+   "clicks": 14199,
+   "cost": 2341231,
+   "conv": 1522,
+   "contribMargin": 7889804,
+   "mult": {
+    "base": 3.37,
+    "w1": 3.42,
+    "w2": 4.18
+   },
+   "avgRank": 5.3,
+   "cpcNow": 165,
+   "cpcTarget": 222,
+   "cpcBep": 556,
+   "action": "확대: 입찰 인상",
+   "actionType": "up",
+   "bidAdj": "+20%",
+   "cpcCap": 200,
+   "daily": {
+    "avg": 42942,
+    "max": 59660,
+    "rec": 65000
+   },
+   "profit": 5548573,
+   "note": "그룹 예산 유지, 소재별 입찰로 조정",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "타겟팅 새우젓",
+   "group": "신규 통합 그룹_새우젓",
+   "clicks": 1247,
+   "cost": 602705,
+   "conv": 135,
+   "contribMargin": 714456,
+   "mult": {
+    "base": 1.19,
+    "w1": 0.98,
+    "w2": 1.4
+   },
+   "avgRank": 2.9,
+   "cpcNow": 483,
+   "cpcTarget": 229,
+   "cpcBep": 573,
+   "action": "유지(BEP 근접): 입찰 소폭 인하",
+   "actionType": "watch",
+   "bidAdj": "-10%",
+   "cpcCap": 430,
+   "daily": {
+    "avg": 35983,
+    "max": 52107,
+    "rec": 36000
+   },
+   "profit": 111751,
+   "note": "예산 소진으로 오후 중단 반복. 김장대전 종료(11/29) 후 재판정",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]수제꼬치",
+   "group": "모듬꼬치 신규 통합그룹",
+   "clicks": 884,
+   "cost": 568769,
+   "conv": 118,
+   "contribMargin": 518038,
+   "mult": {
+    "base": 0.91,
+    "w1": 0.75,
+    "w2": 0.84
+   },
+   "avgRank": 2.4,
+   "cpcNow": 643,
+   "cpcTarget": 234,
+   "cpcBep": 586,
+   "action": "축소: 입찰 인하",
+   "actionType": "down",
+   "bidAdj": "-20%",
+   "cpcCap": 510,
+   "daily": {
+    "avg": 8006,
+    "max": 12233,
+    "rec": 7000
+   },
+   "profit": -50731,
+   "note": "CPC 643원 최고가. 캠핑닭꼬치 그룹은 425원 배수 1.24",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-SHIP]새벽배송제품",
+   "group": "꼬리족발",
+   "clicks": 1426,
+   "cost": 505535,
+   "conv": 151,
+   "contribMargin": 1367237,
+   "mult": {
+    "base": 2.7,
+    "w1": 2.34,
+    "w2": 3.8
+   },
+   "avgRank": 3.1,
+   "cpcNow": 355,
+   "cpcTarget": 384,
+   "cpcBep": 959,
+   "action": "확대: 입찰 인상",
+   "actionType": "up",
+   "bidAdj": "+8%",
+   "cpcCap": 380,
+   "daily": {
+    "avg": 8555,
+    "max": 13464,
+    "rec": 14000
+   },
+   "profit": 861702,
+   "note": "환산계수 0.89로 할인 폭 작아 실효율 최고",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]수제꼬치",
+   "group": "수제꼬치_캠핑닭꼬치",
+   "clicks": 1156,
+   "cost": 491398,
+   "conv": 137,
+   "contribMargin": 609353,
+   "mult": {
+    "base": 1.24,
+    "w1": 1.95,
+    "w2": 1.33
+   },
+   "avgRank": 2.7,
+   "cpcNow": 425,
+   "cpcTarget": 211,
+   "cpcBep": 527,
+   "action": "유지(BEP 근접): 입찰 소폭 인하",
+   "actionType": "watch",
+   "bidAdj": "-10%",
+   "cpcCap": 380,
+   "daily": {
+    "avg": 9586,
+    "max": 27730,
+    "rec": 10000
+   },
+   "profit": 117955,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-SHIP]새벽배송제품",
+   "group": "아롱사태스지수육",
+   "clicks": 815,
+   "cost": 366951,
+   "conv": 75,
+   "contribMargin": 170341,
+   "mult": {
+    "base": 0.46,
+    "w1": 0.43,
+    "w2": 0.58
+   },
+   "avgRank": 3.8,
+   "cpcNow": 450,
+   "cpcTarget": 84,
+   "cpcBep": 209,
+   "action": "OFF",
+   "actionType": "off",
+   "bidAdj": "-100%",
+   "cpcCap": 0,
+   "daily": {
+    "avg": 8430,
+    "max": 15324,
+    "rec": 0
+   },
+   "profit": -196610,
+   "note": "전용 그룹 OFF. 저단가운영 그룹에선 CPC 143원 배수 3.76 흑자라 유지",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]꼬리껍데기",
+   "group": "꼬리껍데기 신규 통합그룹",
+   "clicks": 1069,
+   "cost": 354555,
+   "conv": 116,
+   "contribMargin": 581911,
+   "mult": {
+    "base": 1.64,
+    "w1": 1.47,
+    "w2": 1.15
+   },
+   "avgRank": 2.3,
+   "cpcNow": 332,
+   "cpcTarget": 218,
+   "cpcBep": 544,
+   "action": "유지: 입찰 유지",
+   "actionType": "keep",
+   "bidAdj": "0%",
+   "cpcCap": 330,
+   "daily": {
+    "avg": 6441,
+    "max": 18546,
+    "rec": 7000
+   },
+   "profit": 227356,
+   "note": "",
+   "zone": "keep"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]아롱사태 스지 야채팩",
+   "group": "아롱사태 스지 전골",
+   "clicks": 769,
+   "cost": 346455,
+   "conv": 96,
+   "contribMargin": 230941,
+   "mult": {
+    "base": 0.67,
+    "w1": 0.42,
+    "w2": 0.88
+   },
+   "avgRank": 2.0,
+   "cpcNow": 451,
+   "cpcTarget": 120,
+   "cpcBep": 300,
+   "action": "OFF",
+   "actionType": "off",
+   "bidAdj": "-100%",
+   "cpcCap": 0,
+   "daily": {
+    "avg": 7020,
+    "max": 12758,
+    "rec": 0
+   },
+   "profit": -115514,
+   "note": "마진 17.5%(풀필료 4,800원). CPC 120원 이하에서만 목표 달성",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-SHIP]새벽배송제품",
+   "group": "스지바지락",
+   "clicks": 724,
+   "cost": 321028,
+   "conv": 57,
+   "contribMargin": 491041,
+   "mult": {
+    "base": 1.53,
+    "w1": 0.78,
+    "w2": 3.72
+   },
+   "avgRank": 3.8,
+   "cpcNow": 443,
+   "cpcTarget": 271,
+   "cpcBep": 678,
+   "action": "유지: 입찰 유지",
+   "actionType": "keep",
+   "bidAdj": "0%",
+   "cpcCap": 440,
+   "daily": {
+    "avg": 5991,
+    "max": 13683,
+    "rec": 6000
+   },
+   "profit": 170013,
+   "note": "",
+   "zone": "keep"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]수제꼬치",
+   "group": "수제꼬치_염통꼬치",
+   "clicks": 627,
+   "cost": 279580,
+   "conv": 76,
+   "contribMargin": 316436,
+   "mult": {
+    "base": 1.13,
+    "w1": 1.41,
+    "w2": 1.17
+   },
+   "avgRank": 2.5,
+   "cpcNow": 446,
+   "cpcTarget": 202,
+   "cpcBep": 505,
+   "action": "유지(BEP 근접): 입찰 소폭 인하",
+   "actionType": "watch",
+   "bidAdj": "-10%",
+   "cpcCap": 400,
+   "daily": {
+    "avg": 7914,
+    "max": 16512,
+    "rec": 8000
+   },
+   "profit": 36856,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-NEW]반건조오징어",
+   "group": "반건조오징어_광고그룹",
+   "clicks": 1278,
+   "cost": 207509,
+   "conv": 113,
+   "contribMargin": 256161,
+   "mult": {
+    "base": 1.23,
+    "w1": 1.46,
+    "w2": 1.06
+   },
+   "avgRank": 5.4,
+   "cpcNow": 162,
+   "cpcTarget": 80,
+   "cpcBep": 200,
+   "action": "유지(BEP 근접): 입찰 소폭 인하",
+   "actionType": "watch",
+   "bidAdj": "-10%",
+   "cpcCap": 150,
+   "daily": {
+    "avg": 5823,
+    "max": 12398,
+    "rec": 6000
+   },
+   "profit": 48652,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]손말이고기",
+   "group": "손말이고기 신규 통합그룹",
+   "clicks": 558,
+   "cost": 202341,
+   "conv": 86,
+   "contribMargin": 565830,
+   "mult": {
+    "base": 2.8,
+    "w1": 2.77,
+    "w2": 2.69
+   },
+   "avgRank": 2.9,
+   "cpcNow": 363,
+   "cpcTarget": 406,
+   "cpcBep": 1014,
+   "action": "확대: 입찰 인상",
+   "actionType": "up",
+   "bidAdj": "+12%",
+   "cpcCap": 410,
+   "daily": {
+    "avg": 4615,
+    "max": 8132,
+    "rec": 9000
+   },
+   "profit": 363489,
+   "note": "",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]소꼬리찜",
+   "group": "소꼬리찜_신규통합그룹",
+   "clicks": 346,
+   "cost": 159699,
+   "conv": 51,
+   "contribMargin": 101129,
+   "mult": {
+    "base": 0.63,
+    "w1": 0.47,
+    "w2": 0.28
+   },
+   "avgRank": 3.9,
+   "cpcNow": 462,
+   "cpcTarget": 117,
+   "cpcBep": 292,
+   "action": "OFF",
+   "actionType": "off",
+   "bidAdj": "-100%",
+   "cpcCap": 0,
+   "daily": {
+    "avg": 4495,
+    "max": 7991,
+    "rec": 0
+   },
+   "profit": -58570,
+   "note": "마진 7.6% BEP ROAS 1,314%. 저단가운영 그룹에서만 유지",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "타겟팅 새우젓",
+   "group": "새우젓_쇼핑브랜드형",
+   "clicks": 130,
+   "cost": 103471,
+   "conv": 18,
+   "contribMargin": 103037,
+   "mult": {
+    "base": 1.0,
+    "w1": 1.53,
+    "w2": 0.63
+   },
+   "avgRank": 1.0,
+   "cpcNow": 796,
+   "cpcTarget": 317,
+   "cpcBep": 793,
+   "action": "축소: 입찰 인하",
+   "actionType": "down",
+   "bidAdj": "-20%",
+   "cpcCap": 640,
+   "daily": {
+    "avg": 7957,
+    "max": 12624,
+    "rec": 7000
+   },
+   "profit": -434,
+   "note": "CPC 796원 일반의 1.6배. 평균순위 1.0이라 인하 여지 큼",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-LOW]저단가운영",
+   "group": "저단가운영_광고그룹#2",
+   "clicks": 465,
+   "cost": 53264,
+   "conv": 62,
+   "contribMargin": 183686,
+   "mult": {
+    "base": 3.45,
+    "w1": 2.59,
+    "w2": 5.56
+   },
+   "avgRank": 8.6,
+   "cpcNow": 115,
+   "cpcTarget": 158,
+   "cpcBep": 395,
+   "action": "확대: 입찰 인상",
+   "actionType": "up",
+   "bidAdj": "+20%",
+   "cpcCap": 140,
+   "daily": {
+    "avg": 652,
+    "max": 1187,
+    "rec": 2000
+   },
+   "profit": 130422,
+   "note": "",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]수제꼬치",
+   "group": "수제꼬치_캠핑음식",
+   "clicks": 99,
+   "cost": 42363,
+   "conv": 7,
+   "contribMargin": 28776,
+   "mult": {
+    "base": 0.68,
+    "w1": 2.99,
+    "w2": 0.0
+   },
+   "avgRank": 2.2,
+   "cpcNow": 428,
+   "cpcTarget": 116,
+   "cpcBep": 291,
+   "action": "축소: 입찰 인하",
+   "actionType": "down",
+   "bidAdj": "-20%",
+   "cpcCap": 340,
+   "daily": {
+    "avg": 1644,
+    "max": 3641,
+    "rec": 2000
+   },
+   "profit": -13587,
+   "note": "",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-NEW]장어덮밥",
+   "group": "장어덮밥_통합그룹",
+   "clicks": 303,
+   "cost": 35907,
+   "conv": 12,
+   "contribMargin": 127535,
+   "mult": {
+    "base": 3.55,
+    "w1": 14.03,
+    "w2": null
+   },
+   "avgRank": 4.9,
+   "cpcNow": 119,
+   "cpcTarget": 168,
+   "cpcBep": 421,
+   "action": "확대: 입찰 인상",
+   "actionType": "up",
+   "bidAdj": "+20%",
+   "cpcCap": 140,
+   "daily": {
+    "avg": 295,
+    "max": 923,
+    "rec": 1000
+   },
+   "profit": 91628,
+   "note": "정가 미확인(상품 엑셀에 없음) 환산계수 1.00. 과대 가능, 증액은 정가 확인 후",
+   "zone": "adjust"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]밀푀유나베",
+   "group": "국물밀키트 캠핑용밀키트",
+   "clicks": 47,
+   "cost": 17556,
+   "conv": 4,
+   "contribMargin": 10885,
+   "mult": {
+    "base": 0.62,
+    "w1": 0.0,
+    "w2": 1.09
+   },
+   "avgRank": 4.3,
+   "cpcNow": 374,
+   "cpcTarget": 93,
+   "cpcBep": 232,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 370,
+   "daily": {
+    "avg": 1112,
+    "max": 2722,
+    "rec": 2000
+   },
+   "profit": -6671,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]수제꼬치",
+   "group": "수제꼬치_쇼핑브랜드형",
+   "clicks": 27,
+   "cost": 14465,
+   "conv": 1,
+   "contribMargin": 966,
+   "mult": {
+    "base": 0.07,
+    "w1": 0.0,
+    "w2": 0.0
+   },
+   "avgRank": 1.8,
+   "cpcNow": 536,
+   "cpcTarget": 14,
+   "cpcBep": 36,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 540,
+   "daily": {
+    "avg": 197,
+    "max": 1000,
+    "rec": 1000
+   },
+   "profit": -13499,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]밀푀유나베",
+   "group": "국물요리 캠핑음식추천",
+   "clicks": 37,
+   "cost": 14064,
+   "conv": 3,
+   "contribMargin": 4471,
+   "mult": {
+    "base": 0.32,
+    "w1": 0.52,
+    "w2": 0.0
+   },
+   "avgRank": 7.1,
+   "cpcNow": 380,
+   "cpcTarget": 48,
+   "cpcBep": 121,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 380,
+   "daily": {
+    "avg": 749,
+    "max": 1634,
+    "rec": 1000
+   },
+   "profit": -9593,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "꽃게된장찌개",
+   "group": "신규통합그룹_꽃게된장찌개",
+   "clicks": 10,
+   "cost": 8601,
+   "conv": 0,
+   "contribMargin": 0,
+   "mult": {
+    "base": 0.0,
+    "w1": null,
+    "w2": null
+   },
+   "avgRank": 1.6,
+   "cpcNow": 860,
+   "cpcTarget": 0,
+   "cpcBep": 0,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 860,
+   "daily": {
+    "avg": 0,
+    "max": 0,
+    "rec": 0
+   },
+   "profit": -8601,
+   "note": "10클릭에 8,601원 구매 0건 CPC 860원. 표본부족이나 입찰가 점검 필요",
+   "zone": "issue"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]손말이고기",
+   "group": "손말이고기_쇼핑브랜드형",
+   "clicks": 24,
+   "cost": 8173,
+   "conv": 5,
+   "contribMargin": 43747,
+   "mult": {
+    "base": 5.35,
+    "w1": 0.0,
+    "w2": 15.41
+   },
+   "avgRank": 1.0,
+   "cpcNow": 341,
+   "cpcTarget": 729,
+   "cpcBep": 1823,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 340,
+   "daily": {
+    "avg": 85,
+    "max": 341,
+    "rec": 1000
+   },
+   "profit": 35574,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]아롱사태 스지 야채팩",
+   "group": "아롱사태 스지 야채팩_쇼핑브랜드형",
+   "clicks": 19,
+   "cost": 7139,
+   "conv": 7,
+   "contribMargin": 12681,
+   "mult": {
+    "base": 1.78,
+    "w1": 3.19,
+    "w2": 0.0
+   },
+   "avgRank": 1.0,
+   "cpcNow": 376,
+   "cpcTarget": 267,
+   "cpcBep": 667,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 380,
+   "daily": {
+    "avg": 194,
+    "max": 737,
+    "rec": 1000
+   },
+   "profit": 5542,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]밀푀유나베",
+   "group": "나베밀키트",
+   "clicks": 12,
+   "cost": 2901,
+   "conv": 0,
+   "contribMargin": 0,
+   "mult": {
+    "base": 0.0,
+    "w1": null,
+    "w2": null
+   },
+   "avgRank": 2.8,
+   "cpcNow": 242,
+   "cpcTarget": 0,
+   "cpcBep": 0,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 240,
+   "daily": {
+    "avg": 0,
+    "max": 0,
+    "rec": 0
+   },
+   "profit": -2901,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]소꼬리찜",
+   "group": "소꼬리찜_쇼핑브랜드형",
+   "clicks": 8,
+   "cost": 2728,
+   "conv": 1,
+   "contribMargin": 1119,
+   "mult": {
+    "base": 0.41,
+    "w1": 0.0,
+    "w2": 0.0
+   },
+   "avgRank": 1.8,
+   "cpcNow": 341,
+   "cpcTarget": 56,
+   "cpcBep": 140,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 340,
+   "daily": {
+    "avg": 146,
+    "max": 682,
+    "rec": 1000
+   },
+   "profit": -1609,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "ss",
+   "campaign": "[SS-OLD]쪽갈비",
+   "group": "신규 통합 그룹_쪽갈비구이",
+   "clicks": 2,
+   "cost": 804,
+   "conv": 0,
+   "contribMargin": 0,
+   "mult": {
+    "base": 0.0,
+    "w1": null,
+    "w2": 0.0
+   },
+   "avgRank": 4.7,
+   "cpcNow": 402,
+   "cpcTarget": 0,
+   "cpcBep": 0,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "bidAdj": "0%",
+   "cpcCap": 400,
+   "daily": {
+    "avg": 201,
+    "max": 646,
+    "rec": 1000
+   },
+   "profit": -804,
+   "note": "",
+   "zone": "review"
+  },
+  {
+   "media": "pl",
+   "campaign": "(공통)파워링크_스마트스토어",
+   "group": "[SA-BRAND]브랜드키워드_공통",
+   "clicks": 7058,
+   "cost": 874157,
+   "conv": 1258,
+   "reportRev": 53558540,
+   "reportRoas": "6127%",
+   "realRoas": "3229%",
+   "bepRoas": "324%",
+   "targetRoas": "809%",
+   "mult": {
+    "base": 9.98,
+    "w1": 11.53,
+    "w2": 10.66
+   },
+   "profit": 7847476,
+   "action": "확대: 일예산 상한 해제",
+   "actionType": "up",
+   "note": "브랜드 지명 검색이라 광고 없이도 구매했을 수요 섞임, 배수 과대 가능. 11/17~19 저녁 예산 소진 중단",
+   "zone": "adjust"
+  },
+  {
+   "media": "pl",
+   "campaign": "(공통)파워링크_스마트스토어",
+   "group": "[SA-SP]소꼬리찜_오늘배송",
+   "clicks": 570,
+   "cost": 290164,
+   "conv": 27,
+   "reportRev": 1153510,
+   "reportRoas": "398%",
+   "realRoas": "199%",
+   "bepRoas": "1314%",
+   "targetRoas": "3285%",
+   "mult": {
+    "base": 0.15,
+    "w1": 0.15,
+    "w2": 0.27
+   },
+   "profit": -246273,
+   "action": "OFF",
+   "actionType": "off",
+   "note": "소꼬리찜 마진 7.6% BEP 1,314%. 쇼핑검색 저단가 그룹에서만 유지",
+   "zone": "adjust"
+  },
+  {
+   "media": "pl",
+   "campaign": "(공통)파워링크_스마트스토어",
+   "group": "[SA-SP]수제꼬치",
+   "clicks": 63,
+   "cost": 47008,
+   "conv": 2,
+   "reportRev": 82300,
+   "reportRoas": "175%",
+   "realRoas": "62%",
+   "bepRoas": "253%",
+   "targetRoas": "633%",
+   "mult": {
+    "base": 0.25,
+    "w1": 1.06,
+    "w2": 0.63
+   },
+   "profit": -35484,
+   "action": "축소: 입찰 인하",
+   "actionType": "down",
+   "note": "CPC 746원 63클릭 구매 2건",
+   "zone": "adjust"
+  },
+  {
+   "media": "pl",
+   "campaign": "(공통)파워링크_스마트스토어",
+   "group": "[SA-SP]소꼬리찜_새벽배송",
+   "clicks": 69,
+   "cost": 33820,
+   "conv": 5,
+   "reportRev": 194900,
+   "reportRoas": "576%",
+   "realRoas": "288%",
+   "bepRoas": "1314%",
+   "targetRoas": "3285%",
+   "mult": {
+    "base": 0.22,
+    "w1": 0.58,
+    "w2": 0.0
+   },
+   "profit": -26404,
+   "action": "OFF",
+   "actionType": "off",
+   "note": "오늘배송 그룹과 같은 상품 마진 구조",
+   "zone": "adjust"
+  },
+  {
+   "media": "pl",
+   "campaign": "(공통)파워링크_스마트스토어",
+   "group": "[SA-SHIP]새벽배송_브랜드키워드",
+   "clicks": 33,
+   "cost": 3888,
+   "conv": 7,
+   "reportRev": 271300,
+   "reportRoas": "6978%",
+   "realRoas": "3677%",
+   "bepRoas": "324%",
+   "targetRoas": "809%",
+   "mult": {
+    "base": 11.36,
+    "w1": 0.0,
+    "w2": 1.65
+   },
+   "profit": 40291,
+   "action": "표본부족: 현행 유지",
+   "actionType": "sample",
+   "note": "46일 33클릭 판정 보류",
+   "zone": "review"
+  },
+  {
+   "media": "gfa",
+   "campaign": "[GFA-AB]애드부스트_상시",
+   "purpose": "ADVoost 쇼핑",
+   "period": "10.24~11.22",
+   "days": 30,
+   "clicks": 10732,
+   "cost": 6007246,
+   "conv": 1266,
+   "reportRev": 42444930,
+   "reportRoas": "707%",
+   "realRoas": "366%",
+   "bepRoas": "313%",
+   "targetRoas": "781%",
+   "mult": {
+    "base": 1.17
+   },
+   "profit": 1028426,
+   "action": "유지(BEP 근접): 증액 금지",
+   "actionType": "watch",
+   "note": "일 20만 고정. 전체 흑자이나 요일 편차 큼",
+   "zone": "review"
+  },
+  {
+   "media": "gfa",
+   "campaign": "11월 카탈로그",
+   "purpose": "카탈로그 판매",
+   "period": "11.10~11.22",
+   "days": 8,
+   "clicks": 1759,
+   "cost": 699424,
+   "conv": 87,
+   "reportRev": 2826350,
+   "reportRoas": "404%",
+   "realRoas": "213%",
+   "bepRoas": "324%",
+   "targetRoas": "809%",
+   "mult": {
+    "base": 0.66
+   },
+   "profit": -239173,
+   "action": "축소: 일예산 인하",
+   "actionType": "down",
+   "note": "일 10만. 집행 8일, 2주 더 누적 후 재판정 권장",
+   "zone": "adjust"
+  },
+  {
+   "media": "gfa",
+   "campaign": "애드부스트_산지베스트",
+   "purpose": "ADVoost 쇼핑",
+   "period": "11.17~11.19",
+   "days": 3,
+   "clicks": 363,
+   "cost": 287149,
+   "conv": 47,
+   "reportRev": 1570350,
+   "reportRoas": "547%",
+   "realRoas": "286%",
+   "bepRoas": "352%",
+   "targetRoas": "880%",
+   "mult": {
+    "base": 0.81
+   },
+   "profit": -53902,
+   "action": "축소: 일예산 인하",
+   "actionType": "down",
+   "note": "집행 3일. 산지 상품 마진 낮아 BEP 높음",
+   "zone": "adjust"
+  },
+  {
+   "media": "gfa",
+   "campaign": "블랙프라이데이 캠페인 26.11.17",
+   "purpose": "동영상 조회",
+   "period": "11.18~11.19",
+   "days": 2,
+   "clicks": 75,
+   "cost": 171934,
+   "conv": 6,
+   "reportRev": 236440,
+   "reportRoas": "138%",
+   "realRoas": "72%",
+   "bepRoas": "324%",
+   "targetRoas": "809%",
+   "mult": {
+    "base": 0.22
+   },
+   "profit": -133431,
+   "action": "판정 제외 (조회 목적)",
+   "actionType": "excluded",
+   "note": "조회 목적이라 구매 ROAS로 판정 안 함",
+   "zone": "issue"
+  }
+ ],
+ "gfa_dow": [
+  {
+   "dow": "월",
+   "cost": 816928,
+   "mult": 0.82,
+   "profit": -143036,
+   "action": "축소: 일예산 인하",
+   "actionType": "down"
+  },
+  {
+   "dow": "화",
+   "cost": 801045,
+   "mult": 1.27,
+   "profit": 216297,
+   "action": "유지(BEP 근접): 증액 금지",
+   "actionType": "watch"
+  },
+  {
+   "dow": "수",
+   "cost": 783385,
+   "mult": 1.86,
+   "profit": 676908,
+   "action": "유지",
+   "actionType": "keep"
+  },
+  {
+   "dow": "목",
+   "cost": 790817,
+   "mult": 2.16,
+   "profit": 913420,
+   "action": "유지",
+   "actionType": "keep"
+  },
+  {
+   "dow": "금",
+   "cost": 792907,
+   "mult": 1.36,
+   "profit": 283583,
+   "action": "유지(BEP 근접): 증액 금지",
+   "actionType": "watch"
+  },
+  {
+   "dow": "토",
+   "cost": 1025256,
+   "mult": 0.48,
+   "profit": -530600,
+   "action": "축소: 일예산 인하",
+   "actionType": "down"
+  },
+  {
+   "dow": "일",
+   "cost": 996908,
+   "mult": 0.61,
+   "profit": -388146,
+   "action": "축소: 일예산 인하",
+   "actionType": "down"
+  }
+ ],
+ "gate": "조치는 제안. 광고시스템 반영은 Rachel이 직접 (승인 게이트 G1)"
+}

@@ -1,17 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>백년밥상 미디어 믹스</title>
-<meta http-equiv="refresh" content="0; url=/media-mix/2026-10">
-<link rel="canonical" href="/media-mix/2026-10">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>백년밥상 미디어믹스</title>
+<script src="/mm-gate.js"></script>
 <script>
-/* 최신 월로 리다이렉트 — 월이 늘어나면 이 배열만 갱신 */
-var MONTHS=["2026-10"];
-location.replace("/media-mix/"+MONTHS[MONTHS.length-1]);
+/* 최신 월로 리다이렉트 — /api/mm/months 결과 기준 (월 추가 시 코드 수정 불필요) */
+(async function () {
+  try {
+    const r = await fetch('/api/mm/months').then((r) => r.json());
+    const ms = ((r && r.months) || []).slice().sort().reverse();
+    if (ms.length) { location.replace('/media-mix/' + ms[0]); return; }
+  } catch (e) { /* noop */ }
+  document.getElementById('msg').textContent = '등록된 월이 없습니다. 시드 적재 후 새로고침하세요.';
+})();
 </script>
 </head>
-<body style="font-family:system-ui;padding:2rem;color:#52525b">
-최신 월로 이동 중… <a href="/media-mix/2026-10">2026년 10월 미디어 믹스</a>
+<body style="font-family:system-ui,-apple-system,'Apple SD Gothic Neo',sans-serif;padding:2rem;color:#52525b">
+<p id="msg">최신 월로 이동 중…</p>
 </body>
 </html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>백년밥상 운영 리포트</title>
+<script src="/mm-gate.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #f3f4f6; }
+  iframe { border: 0; width: 100%; height: 100vh; display: block; }
+  .msg { font-family: system-ui, -apple-system, 'Apple SD Gothic Neo', sans-serif; padding: 2rem; color: #52525b; }
+</style>
+</head>
+<body>
+<div id="root"><p class="msg">리포트 불러오는 중…</p></div>
+<script>
+(async function () {
+  const m = (location.pathname.match(/(\d{4}-\d{2})/) || [])[1];
+  const root = document.getElementById('root');
+  if (!m) { root.innerHTML = '<p class="msg">월을 찾을 수 없습니다.</p>'; return; }
+  document.title = '백년밥상 ' + m + ' 운영 리포트';
+  try {
+    const r = await fetch('/api/mm/report?month=' + encodeURIComponent(m));
+    if (!r.ok) { root.innerHTML = '<p class="msg">' + m + ' 리포트가 아직 없습니다.</p>'; return; }
+    const j = await r.json();
+    if (!j || !j.html) { root.innerHTML = '<p class="msg">' + m + ' 리포트 본문이 비어 있습니다.</p>'; return; }
+    root.innerHTML = '';
+    const f = document.createElement('iframe');
+    f.setAttribute('title', m + ' 운영 리포트');
+    root.appendChild(f);
+    f.srcdoc = j.html;
+  } catch (e) {
+    root.innerHTML = '<p class="msg">리포트 불러오기 실패.</p>';
+  }
+})();
+</script>
+</body>
+</html>
