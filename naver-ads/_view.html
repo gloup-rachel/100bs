@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>네이버 광고 시스템</title>
+<script src="/mm-gate.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#f3f4f6;--card:#fff;--ink:#15171c;--ink2:#4b5060;--ink3:#8a8f9c;--line:#e4e6eb;--line2:#eef0f3;--head:#f6f7f9;
+  --shop:#1d9a55;--pl:#0f7f8c;--gfa:#8a5ad6;
+  --up:#1d9a55;--up-bg:#e3f4ea;--down:#b06a00;--down-bg:#fbefd6;--off:#c43d3d;--off-bg:#fbe4e4;
+  --watch:#3a5bd0;--watch-bg:#e6ebfb;--gray:#6b7280;--gray-bg:#eef0f3;--pos:#1d9a55;--neg:#c43d3d;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111317;--card:#191c21;--ink:#eceef2;--ink2:#b3b8c4;--ink3:#7d8391;--line:#2a2e36;--line2:#23262d;--head:#1f2228;
+  --shop:#4cc783;--pl:#41b8c6;--gfa:#b08cf0;
+  --up:#4cc783;--up-bg:#183526;--down:#e2b04a;--down-bg:#362a10;--off:#f0736f;--off-bg:#3a1c1c;
+  --watch:#8ea4ff;--watch-bg:#232a4a;--gray:#9099a6;--gray-bg:#23262d;--pos:#4cc783;--neg:#f0736f;color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#111317;--card:#191c21;--ink:#eceef2;--ink2:#b3b8c4;--ink3:#7d8391;--line:#2a2e36;--line2:#23262d;--head:#1f2228;
+  --shop:#4cc783;--pl:#41b8c6;--gfa:#b08cf0;
+  --up:#4cc783;--up-bg:#183526;--down:#e2b04a;--down-bg:#362a10;--off:#f0736f;--off-bg:#3a1c1c;
+  --watch:#8ea4ff;--watch-bg:#232a4a;--gray:#9099a6;--gray-bg:#23262d;--pos:#4cc783;--neg:#f0736f;color-scheme:dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:14px;line-height:1.5}
+.num{font-variant-numeric:tabular-nums}
+.wrap{max-width:1120px;margin:0 auto;padding:26px 18px 64px;display:flex;flex-direction:column;gap:22px}
+header.top h1{font-size:22px;margin:0;font-weight:700}
+header.top p{margin:5px 0 0;color:var(--ink2);font-size:12.5px}
+.mchip{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.mchip i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.i-ss{background:var(--shop)}.i-pl{background:var(--pl)}.i-gfa{background:var(--gfa)}
+/* summary cards */
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.mcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.mcard .h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mcard .profit{font-size:28px;font-weight:700;letter-spacing:-.02em;margin:10px 0 2px}
+.mcard .meta{color:var(--ink2);font-size:12.5px}
+.mcard .cnt{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.pill{font:600 11px/1.6 "IBM Plex Sans KR";padding:3px 8px;border-radius:999px;white-space:nowrap}
+.p-up{background:var(--up-bg);color:var(--up)}.p-down{background:var(--down-bg);color:var(--down)}
+.p-off{background:var(--off-bg);color:var(--off)}.p-watch{background:var(--watch-bg);color:var(--watch)}
+.p-sample,.p-keep,.p-excluded{background:var(--gray-bg);color:var(--gray)}
+/* tabs */
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+.tabs button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink2);padding:7px 14px;cursor:pointer}
+.tabs button+button{border-left:1px solid var(--line)}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--card);font-weight:600}
+.sec-h{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:6px 0 10px}
+.sec-h .n{font:600 12px/1.2 "IBM Plex Sans KR";padding:4px 9px;border-radius:7px}
+.sec-h h2{font-size:16px;margin:0;font-weight:700}
+.sec-h .m{color:var(--ink3);font-size:12px}
+.n-adjust{background:var(--off-bg);color:var(--off)}.n-review{background:var(--watch-bg);color:var(--watch)}.n-issue{background:#f0e0b0;color:#7a5a00}
+@media(prefers-color-scheme:dark){.n-issue{background:#3a2e12;color:#f0c870}}
+/* row list */
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:12px;padding:12px 15px;cursor:pointer}
+.row.up{border-left-color:var(--up)}.row.down{border-left-color:var(--down)}.row.off{border-left-color:var(--off)}
+.row.watch{border-left-color:var(--watch)}.row.sample,.row.keep,.row.excluded{border-left-color:var(--gray)}
+.row .r1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.row .nm{font-weight:600;font-size:14px}.row .nm small{color:var(--ink3);font-weight:400;margin-left:6px;font-size:12px}
+.badge{font:600 11.5px/1.3 "IBM Plex Sans KR";padding:3px 9px;border-radius:7px;white-space:nowrap}
+.b-up{background:var(--up-bg);color:var(--up)}.b-down{background:var(--down-bg);color:var(--down)}
+.b-off{background:var(--off-bg);color:var(--off)}.b-watch{background:var(--watch-bg);color:var(--watch)}
+.b-sample,.b-keep,.b-excluded{background:var(--gray-bg);color:var(--gray)}
+.spacer{flex:1}
+.profit.pos{color:var(--pos)}.profit.neg{color:var(--neg)}
+.row .r2{display:flex;flex-wrap:wrap;gap:14px;margin-top:9px;font-size:12.5px;color:var(--ink2)}
+.kv{display:flex;gap:5px;align-items:baseline}.kv .k{color:var(--ink3);font-size:11.5px}.kv .v{font-weight:600;color:var(--ink)}
+.rec{color:var(--ink);font-weight:600}
+.trend{display:inline-flex;gap:3px;align-items:center;font-size:11.5px;color:var(--ink3)}
+.trend b{color:var(--ink2);font-weight:600}
+.note{display:none;margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--ink2)}
+.row.open .note{display:block}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:4px}
+.dcell{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 6px;text-align:center}
+.dcell .d{font-weight:600;font-size:12px}.dcell .x{font-size:15px;font-weight:700;margin:3px 0}.dcell .p{font-size:11px}
+.foot{color:var(--ink3);font-size:11.5px;line-height:1.7;border-top:1px solid var(--line);padding-top:14px;margin-top:6px}
+.empty{color:var(--ink3);font-size:12.5px;padding:10px 2px}
+#msg{color:var(--ink2);padding:40px 0;text-align:center}
+.keepbar{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px 14px;color:var(--ink2);font-size:12.5px}
+.chk{width:22px;height:22px;flex:0 0 auto;border:1.5px solid var(--line);border-radius:6px;background:var(--card);color:transparent;font:700 13px/1 "IBM Plex Sans KR";cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:border-color .12s,background .12s,color .12s}
+.chk:hover{border-color:var(--up);color:var(--up);background:var(--up-bg)}
+.donebar{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px 14px;color:var(--ink2);font-size:12.5px}
+.donebar>summary{cursor:pointer;font-weight:600;list-style:none;display:flex;align-items:center;gap:7px}
+.donebar>summary::-webkit-details-marker{display:none}
+.donebar>summary::before{content:"▸";color:var(--ink3);transition:transform .12s}
+.donebar[open]>summary::before{transform:rotate(90deg)}
+.doneitem{display:flex;align-items:center;gap:10px;padding:9px 2px 2px;border-top:1px solid var(--line2);margin-top:9px}
+.doneitem:first-of-type{margin-top:11px}
+.doneitem .u{margin-left:auto;font:600 11.5px/1 "IBM Plex Sans KR";border:1px solid var(--line);background:var(--card);color:var(--ink2);padding:6px 11px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.doneitem .u:hover{border-color:var(--ink2);color:var(--ink)}
+</style></head>
+<body>
+<div class="wrap" id="app"><div id="msg">불러오는 중…</div></div>
+<script>
+const MEDIA={ss:{n:"쇼핑검색",c:"i-ss"},pl:{n:"파워링크",c:"i-pl"},gfa:{n:"GFA",c:"i-gfa"}};
+const ATYPE={up:{b:"b-up",p:"p-up",n:"확대"},down:{b:"b-down",p:"p-down",n:"축소"},off:{b:"b-off",p:"p-off",n:"OFF"},
+  watch:{b:"b-watch",p:"p-watch",n:"BEP 근접"},sample:{b:"b-sample",p:"p-sample",n:"표본부족"},keep:{b:"b-keep",p:"p-keep",n:"유지"},excluded:{b:"b-excluded",p:"p-excluded",n:"제외"}};
+const won=n=>n==null?"-":(Math.round(n)).toLocaleString("ko-KR");
+const man=n=>n==null?"-":(n>=0?"+":"")+Math.round(n/10000).toLocaleString("ko-KR")+"만";
+const esc=s=>String(s==null?"":s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+let DATA=null, FILTER="all", DONE=new Set();
+const doneKey=()=>"nads_done_"+DATA.period.start+"_"+DATA.period.end;
+function loadDone(){ try{ return new Set(JSON.parse(localStorage.getItem(doneKey()))||[]); }catch(e){ return new Set(); } }
+function saveDone(){ try{ localStorage.setItem(doneKey(),JSON.stringify([...DONE])); }catch(e){} }
+const isDone=r=>DONE.has(r._i);
+function liveCounts(k){ const c={}; (DATA.rows||[]).forEach(r=>{ if(r.media!==k)return; if((r.zone==="adjust"||r.zone==="review")&&isDone(r))return; c[r.actionType]=(c[r.actionType]||0)+1; }); return c; }
+
+function mcard(m){
+  const cnt=Object.entries(liveCounts(m.key)).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="pill ${ATYPE[k]?.p||'p-keep'}">${ATYPE[k]?.n||k} ${v}</span>`).join("");
+  const pr=m.profit>=0?"pos":"neg";
+  return `<div class="mcard"><div class="h"><span class="mchip"><i class="${MEDIA[m.key].c}"></i>${m.name}</span><span class="meta num">배수 ${m.multiple}x</span></div>
+    <div class="profit num ${pr}">${man(m.profit)}<span style="font-size:13px;color:var(--ink3);font-weight:500"> 광고후손익</span></div>
+    <div class="meta num">비용 ${won(m.cost)}원 · 전환 ${won(m.conv)}건 · 보고ROAS ${m.reportRoas}</div>
+    <div class="cnt">${cnt}</div></div>`;
+}
+function trend(mu){ if(!mu)return""; const f=v=>v==null?"·":v+"x";
+  return `<span class="trend">배수 <b>${f(mu.base)}</b> → ${f(mu.w1)} → <b>${f(mu.w2)}</b></span>`; }
+function row(r,checkable){
+  const a=ATYPE[r.actionType]||ATYPE.keep;
+  const sub=r.media==="gfa"?(r.purpose||""):(r.group||"");
+  const pr=r.profit>=0?"pos":"neg";
+  const chk=checkable?`<button class="chk" title="조치 완료 — 목록에서 숨김" onclick="event.stopPropagation();markDone(${r._i})">✓</button>`:"";
+  let kvs=[];
+  if(r.media!=="gfa"){
+    if(r.bidAdj&&r.bidAdj!=="0%") kvs.push(`<span class="kv"><span class="k">입찰</span><span class="v rec">${esc(r.bidAdj)}</span></span>`);
+    if(r.cpcNow!=null) kvs.push(`<span class="kv"><span class="k">CPC</span><span class="v num">${won(r.cpcNow)}→${won(r.cpcCap)}</span></span>`);
+    if(r.daily&&r.daily.rec!=null) kvs.push(`<span class="kv"><span class="k">권장일예산</span><span class="v num rec">${won(r.daily.rec)}원</span></span>`);
+    if(r.avgRank!=null) kvs.push(`<span class="kv"><span class="k">평균순위</span><span class="v num">${r.avgRank}</span></span>`);
+  }
+  kvs.push(`<span class="kv"><span class="k">비용</span><span class="v num">${won(r.cost)}원</span></span>`);
+  kvs.push(`<span class="kv"><span class="k">클릭</span><span class="v num">${won(r.clicks)}</span></span>`);
+  return `<div class="row ${r.actionType}" onclick="this.classList.toggle('open')">
+    <div class="r1">${chk}<span class="mchip" style="font-size:12px"><i class="${MEDIA[r.media].c}"></i></span>
+      <span class="nm">${esc(r.campaign)}<small>${esc(sub)}</small></span>
+      <span class="spacer"></span>
+      <span class="profit num ${pr}" style="font-weight:700">${man(r.profit)}</span>
+      <span class="badge ${a.b}">${esc(r.action)}</span></div>
+    <div class="r2">${trend(r.mult)}${kvs.join("")}</div>
+    ${r.note?`<div class="note">${esc(r.note)}</div>`:""}</div>`;
+}
+function section(title,zone,rows,ncls,checkable){
+  const rs=rows.filter(r=>r.zone===zone&&(FILTER==="all"||r.media===FILTER)&&!(checkable&&isDone(r)));
+  if(!rs.length){
+    const hasDone=checkable&&rows.some(r=>r.zone===zone&&(FILTER==="all"||r.media===FILTER)&&isDone(r));
+    return `<section><div class="sec-h"><span class="n ${ncls}">0</span><h2>${title}</h2></div><div class="empty">${hasDone?"모두 조치 완료 ✓":"해당 항목 없음"}</div></section>`;
+  }
+  rs.sort((a,b)=>Math.abs(b.profit||0)-Math.abs(a.profit||0));
+  return `<section><div class="sec-h"><span class="n ${ncls}">${rs.length}</span><h2>${title}</h2></div><div class="rows">${rs.map(r=>row(r,checkable)).join("")}</div></section>`;
+}
+function doneBlock(){
+  const ds=(DATA.rows||[]).filter(r=>(r.zone==="adjust"||r.zone==="review")&&isDone(r)&&(FILTER==="all"||r.media===FILTER));
+  if(!ds.length) return "";
+  const items=ds.map(r=>{const sub=r.media==="gfa"?(r.purpose||""):(r.group||"");
+    return `<div class="doneitem"><span class="mchip" style="font-size:12px"><i class="${MEDIA[r.media].c}"></i></span><span class="nm" style="font-weight:600">${esc(r.campaign)}<small style="color:var(--ink3);font-weight:400;margin-left:6px">${esc(sub)}</small></span><button class="u" onclick="undoDone(${r._i})">되돌리기</button></div>`;}).join("");
+  return `<details class="donebar"><summary>조치 완료 ${ds.length}건 — 펼쳐서 되돌리기</summary>${items}</details>`;
+}
+function dowBlock(){
+  if(FILTER!=="all"&&FILTER!=="gfa") return "";
+  const d=DATA.gfa_dow||[]; if(!d.length)return"";
+  const cells=d.map(x=>{const a=ATYPE[x.actionType]||ATYPE.keep;const pr=x.profit>=0?"pos":"neg";
+    return `<div class="dcell" style="border-left:3px solid var(--${x.actionType==='down'?'down':x.actionType==='keep'?'line':'watch'})"><div class="d">${x.dow}</div><div class="x num ${pr}">${x.mult}x</div><div class="p num ${pr}" style="color:var(--${pr==='pos'?'pos':'neg'})">${man(x.profit)}</div></div>`;}).join("");
+  return `<section><div class="sec-h"><span class="n n-issue">7</span><h2>GFA 애드부스트 요일별</h2><span class="m">토·일 적자 → 주말 일예산 인하 검토</span></div><div class="dow">${cells}</div></section>`;
+}
+function render(){
+  const d=DATA;
+  const tabs=["all","ss","pl","gfa"].map(k=>`<button aria-pressed="${FILTER===k}" onclick="setF('${k}')">${k==="all"?"전체":MEDIA[k].n}</button>`).join("");
+  const app=document.getElementById("app");
+  app.innerHTML=`
+  <header class="top"><h1>네이버 광고 시스템</h1>
+    <p>쇼핑검색 · 파워링크 · GFA 캠페인 효율 관리 | 기준 ${d.period.start}~${d.period.end} (${d.period.days}일) · 목표 배수 ${d.target_multiple} · 갱신 ${d.updated_at}</p>
+    <p style="color:var(--ink3)">${esc(d.rule)}</p></header>
+  <div class="sum">${d.media.map(mcard).join("")}</div>
+  <div class="tabs">${tabs}</div>
+  ${section("조정 필요","adjust",d.rows,"n-adjust",true)}
+  ${section("확인 필요","review",d.rows,"n-review",true)}
+  ${section("이슈","issue",d.rows,"n-issue",false)}
+  ${dowBlock()}
+  <div class="keepbar">유지(현행) ${d.rows.filter(r=>r.zone==="keep"&&(FILTER==="all"||r.media===FILTER)).length}건 — 조치 불필요, 현 입찰 유지</div>
+  ${doneBlock()}
+  <div class="foot">조치는 제안입니다. 실제 광고시스템 반영은 Rachel이 직접 수행합니다 (승인 게이트 G1). 배수 = 실ROAS ÷ 목표 ROAS 환산 손익 지표. 손익 임팩트 큰 순 정렬. 행을 누르면 비고가 펼쳐집니다. 왼쪽 <b style="color:var(--up)">✓</b> 체크 = 조치 완료 → 목록에서 숨김(이 브라우저 저장, 주간 갱신 시 리셋). 완료 항목은 하단 "조치 완료" 바에서 되돌릴 수 있어요.</div>`;
+}
+window.setF=k=>{FILTER=k;render();};
+window.markDone=i=>{DONE.add(i);saveDone();render();};
+window.undoDone=i=>{DONE.delete(i);saveDone();render();};
+(async function(){
+  try{
+    const r=await fetch("/api/mm/nads"); if(!r.ok) throw new Error(r.status);
+    DATA=await r.json();
+    (DATA.rows||[]).forEach((r,i)=>{r._i=i;});
+    DONE=loadDone();
+    render();
+  }catch(e){ document.getElementById("msg").textContent="데이터를 불러오지 못했습니다 ("+e.message+"). 로그인이 필요할 수 있어요."; }
+})();
+</script>
+</body></html>
